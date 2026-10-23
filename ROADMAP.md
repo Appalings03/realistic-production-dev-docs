@@ -16,25 +16,25 @@ Objectif : des chaînes de production plus réalistes — roche brute → minera
 
 ## Architecture (5 repos + dev-docs)
 
-| Repo | Mod | Rôle | Avancement |
-| --- | --- | --- | --- |
-| assets | `realistic_production_assets` | graphismes, sons | ◐ images de test (`graphics/dev/`), README obsolète |
-| utils | `realistic_production_utils` | fonctions communes | ◐ `general.lua` fait (6 fonctions), 4 modules vides |
-| ore | `realistic_production_ore` | roches, minerais, fluides, éléments, alliages | ◐ données générées, `data.lua` vide |
-| building | `realistic_production_building` | machines, multiblocs | ▫ vide |
-| core | `realistic_production_main` | charge les autres, adapte le vanilla | ▫ vide |
-| dev-docs | (documentation) | roadmap, TODO, rapport, notes de conception, `proto_table/` | ✓ |
+| Repo     | Mod                               | Rôle                                                         | Avancement                                              |
+| -------- | --------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------- |
+| assets   | `realistic_production_assets`   | graphismes, sons                                              | ◐ images de test (`graphics/dev/`), README obsolète |
+| utils    | `realistic_production_utils`    | fonctions communes                                            | ◐ `general.lua` fait (6 fonctions), 4 modules vides  |
+| ore      | `realistic_production_ore`      | roches, minerais, fluides, éléments, alliages               | ◐ données générées, `data.lua` vide              |
+| building | `realistic_production_building` | machines, multiblocs                                          | ▫ vide                                                 |
+| core     | `realistic_production_main`     | charge les autres, adapte le vanilla                          | ▫ vide                                                 |
+| dev-docs | (documentation)                   | roadmap, TODO, rapport, notes de conception, `proto_table/` | ✓                                                      |
 
 Dépendances : `assets` et `utils` ne dépendent que de `base` ; `ore` et `building` dépendent d'`assets` et d'`utils` ; `main` dépend des quatre autres.
 
 ## Phase 0 — Fondations *(presque terminée)*
 
-- [x] Découpage en 5 mods et dépendances, tous en 2.1
-- [x] Fonctions générales utils (`normalize_name`, `icon_path`, `icons`, `add_proto`, `copy_proto`, `get_settings`)
-- [x] Modèle de données : 88 ressources, 118 éléments, 5 alliages, groupes et sous-groupes, 115 lignes de composition (script Python)
-- [x] Niveaux (`level`) et quantités d'alliages remplis
-- [x] Nettoyage : faute `buidling`, versions 2.1, `bool = {}` retiré des settings de building
-- [ ] **Convention de noms** : `-` ou `_`, préfixes, collisions Space Age (utils et générateur ne sont pas d'accord)
+- [X] Découpage en 5 mods et dépendances, tous en 2.1
+- [X] Fonctions générales utils (`normalize_name`, `icon_path`, `icons`, `add_proto`, `copy_proto`, `get_settings`)
+- [X] Modèle de données : 88 ressources, 118 éléments, 5 alliages, groupes et sous-groupes, 115 lignes de composition (script Python)
+- [X] Niveaux (`level`) et quantités d'alliages remplis
+- [X] Nettoyage : faute `buidling`, versions 2.1, `bool = {}` retiré des settings de building
+- [X] **Convention de noms** : `-` ou `_`, préfixes, collisions Space Age (utils et générateur ne sont pas d'accord)
 - [ ] **Définition du `level`** d'un élément et alignement des 5 cas incohérents
 - [ ] Données de la mécanique des scories : colonnes `primary` (composition) et `tech` (resources)
 
