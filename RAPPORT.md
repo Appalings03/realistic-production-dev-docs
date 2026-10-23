@@ -29,7 +29,7 @@ Le reste n'empêche pas le démarrage : un mod sans `data.lua` se charge sans er
 - Le commentaire d'exemple lit `rp-placeholder-icons`, mais le setting réel s'appelle « Dev assets » : à aligner (voir ore).
 - Le chemin hors mode dev vise `graphics/items/<nom>.png`, un dossier qui n'existe pas dans assets. Le README d'assets note une autre convention (`graphics/mod_part/part/part.png`) : à trancher, les deux ne coïncident pas.
 - `normalize_name` ne fait que minuscules + espaces → `_`, alors que les ids vanilla ont des tirets (`iron-ore`) et que les données mélangent les deux.
-- **Loader absent** (connu) : rien ne lit les `*_data.lua` d'ore. Les fichiers `utils/ore.lua`, `assets.lua`, `building.lua`, `main.lua`, `function/multi.lua` et `function/world.lua` sont vides. `multi.lua` et `world.lua` ne sont même pas dans le `data.lua` d'utils.
+- **Loader absent** (connu) : rien ne lit les `*_data.lua` d'ore. Les fichiers `utils/ore.lua`, `assets.lua`, `building.lua`, `main.lua`, `function/multi.lua` et `function/world.lua` sont vides. `multi.lua` et `world.lua` ne sont même pas dans le `data.lua` d'utils. => Voir [[TODO.md]]
 - Les autres mods doivent faire `require("__realistic_production_utils__.utils.general")` : à noter dans un README.
 
 ## ore
@@ -100,7 +100,7 @@ Le reste n'empêche pas le démarrage : un mod sans `data.lua` se charge sans er
 
 ---
 
-Rapport par repo — 22 oct. 2026
+# Rapport par repo — 22 oct. 2026
 
 Les fichiers vides ne portent pas de nom de repo : je les ai attribués d'après `info.json` et les fichiers uniques (`prototypes/` → ore, `utils/` → utils…). À vérifier si un cas semble mal placé.
 
