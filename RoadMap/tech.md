@@ -139,8 +139,36 @@ Les noms exacts varient selon les technologies présentes dans Factorio et les m
 - Les technologies de productivité ne doivent pas court-circuiter les étapes matérielles centrales.
 - Vérifier que les technologies vanilla conservées n’exigent pas de recette ou d’ingrédient retiré par le mod.
 
+## Roches verrouillées, scories et retraitement
+
+Ces technologies portent la progression d'extraction décrite dans `Item.md` (section 7). Les noms sont des noms de travail.
+
+| Technologie | Effet | Étape indicative |
+| --- | --- | --- |
+| Prospection de base | Déverrouille un premier groupe de roches (colonne `tech` de `resources`) | 0 à 1 |
+| Prospection avancée | Déverrouille les roches et minerais `advanced` (péridotite, kimberlite, spodumène…) | 2 à 3 |
+| Retraitement des scories | Recette qui trie les scories d'une famille | 1 à 2 |
+| Valorisation des scories | Scories → béton et matériaux de construction | 1 à 2 |
+| Extraction secondaire | Récupère les éléments non principaux (`primary` = no) des roches brutes | 2 à 3 |
+| Extraction des éléments rares | Terres rares, platinoïdes, niobium, tantale depuis les scories ou les concentrés | 4 |
+
+Règles :
+
+- Le jeu doit démarrer avec au moins une roche extractible par famille utile aux premiers packs de science (fer, cuivre, pierre, charbon). Aucune roche de départ ne doit demander une recherche fabriquée avec ses propres produits.
+- Une roche verrouillée a une seule technologie (colonne `tech`) ; cette technologie ne demande que des packs fabricables avec les roches déjà disponibles.
+- Les scories ne bloquent jamais une machine pleine : prévoir un moyen de les stocker, de les retraiter ou de les détruire à coût raisonnable.
+
+## Déblocage des bâtiments
+
+- Chaque machine a une technologie de déblocage, indiquée dans sa fiche (`machine.md`).
+- Un bâtiment qui en demande un autre (`machine.md`, « Dépendances entre bâtiments ») est débloqué par la même technologie ou par une technologie qui a celle du bâtiment requis comme prérequis.
+- Le niveau (`basic`, `advanced`, `experimental`) d'une machine suit celui de la technologie qui la débloque, et doit être cohérent avec les packs de science de l'étape correspondante.
+- Une technologie débloque une machine et une première recette utilisable avec les matières déjà accessibles (recette « bootstrap »), comme indiqué dans les règles ci-dessus.
+
 ## Inconnues à équilibrer
 
+- Technologies de prospection : combien de paliers, et quelles roches de départ.
+- Une scorie unique ou une par famille, donc le nombre de technologies de retraitement.
 - Nombre final de nouveaux packs de science et couleurs/icônes.
 - Liste des recherches vanilla modifiées, conservées ou supprimées.
 - Coût et temps de recherche par palier.

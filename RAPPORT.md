@@ -1,169 +1,127 @@
-# Rapport par repo — révisé le 23 oct. 2026
+# Rapport d'état — 23 oct. 2026
 
-Basé sur la lecture des 5 repos (derniers commits : assets `a6fcc8b`, building `3684125`, core `21c72b6`, ore `f86d8c4`, utils `c7389b8`).
-Rien n'a été lancé dans Factorio : les erreurs de chargement annoncées sont déduites du code, pas testées.
+Fondé sur la lecture des fichiers de chaque repo au 23 oct. 2026 (commits : assets `46be2ab`, utils `1c73544`, ore `475408a`, building `b2f605b`, core `f8ceb39`, dev-docs `939e9a2`) et sur l'analyse du tableur `proto_table/elements.xlsx`.
 
-## Corrections par rapport à la version du 22 oct.
+**Limites** : rien n'a été lancé dans Factorio et `verify.lua` n'a pas été exécuté. Les erreurs de chargement annoncées sont déduites du code, pas testées. Ce fichier remplace toutes les versions précédentes du rapport.
 
-La première version a été écrite sans avoir lu les repos. Ce qui était faux :
+## En bref
 
-- Pas de faux `icon.png` : assets contient de vrais PNG (`graphics/dev/`).
-- Pas de `settings copy.lua`, pas de `migrations.lua`, pas de `trancate`.
-- Pas de faute `buidling` : `realistic_production_building` est bien écrit partout.
-- `core` est déjà en 2.1 (je le disais en 2.0).
-- ore n'a pas de `prototypes/entity|item|recipe|technologie|globals|util.lua`, seulement un `dev.lua` vide.
-- building et core n'ont **pas** de `data.lua` (je disais que building en avait un).
-- Le setting « Dev assets » est dans le `settings.lua` de **ore** (j'avais écrit main).
+- Le projet est en phase de **fondations**. Les cinq mods ne définissent encore aucun prototype de jeu (items, entités, recettes) : seuls ore et building déclarent des settings.
+- Aucun bloquant de chargement n'a été trouvé. L'ancien bloquant (`building/settings.lua` avec `local bool = {}`) est corrigé.
+- Le manque principal est le **loader** : `ore/data.lua` est vide, donc les 6 fichiers de données générés ne sont lus par personne.
+- Les données sont complètes dans leur structure mais incomplètes dans leur contenu : 44 ressources sur 88 ont une composition.
+- Trois décisions bloquent l'écriture du code d'ore : la convention de noms, la mécanique des scories et la cohérence des niveaux (voir « Décisions à prendre »).
 
-Confirmé par l'analyse des données : 88 ressources, 118 éléments, 5 alliages, `materials_data` / `components_data` vides, et la plupart des manques de composition annoncés (détail dans la section ore).
+## État par repo
 
-## Bloquant avant un premier lancement
+| Repo | Mod | Avancement | Contenu réel |
+| --- | --- | --- | --- |
+| assets | `realistic_production_assets` | ◐ | 4 icônes 64×64 et 4 images 256×256 de test (1x1, 2x2, 3x3, 3x5) dans `graphics/dev/` |
+| utils | `realistic_production_utils` | ◐ | `general.lua` (6 fonctions) ; `data.lua` charge 5 modules dont 4 sont vides |
+| ore | `realistic_production_ore` | ◐ | 6 fichiers de données générés ; `data.lua` vide |
+| building | `realistic_production_building` | ▫ | rien : 6 fichiers `prototypes/` vides, pas de `data.lua` |
+| core | `realistic_production_main` | ▫ | rien : stubs vides, pas de `data.lua` |
+| dev-docs | (documentation) | ✓ | roadmap, TODO, rapport, notes de conception, `proto_table/` |
 
-- **`building/settings.lua`** : `local bool = {}` est passé à `data:extend({order, bool})`. Une table sans `type` devrait provoquer une erreur « Missing type » au chargement (à confirmer en lançant le jeu). Comme `core` dépend de building, tout le mod serait touché. À supprimer, ainsi que `RM-stp-order` (nom d'un autre projet, sans locale).
+Tous les `info.json` sont en `factorio_version` 2.1 avec `base >= 2.1`, et `building` est correctement orthographié partout.
 
-Le reste n'empêche pas le démarrage : un mod sans `data.lua` se charge sans erreur.
+## assets
+
+- Contenu sain : les images de test servent de support aux icônes teintées et aux entités.
+- `graphics/README.md` est obsolète : il parle de 32×32, de `prototypes/util.lua` (qui n'existe pas) et de dossiers `realistic-iron-ore/icon.png`. Ta note « Not right anymore / `Graphics/mod_part/part/part.png` » n'est pas une convention rédigée.
+- `thumbnail.png` est un vrai PNG de 720×380, identique dans les 6 repos. Le mod portal affiche des miniatures plus petites (144×144 recommandé).
+- À prévoir : une entité `resource` demande des `stages`. Les images 256×256 sont des images uniques, utilisables en test avec une seule variation.
 
 ## utils
 
-- `icon_path` et `icons` sont en place. Ménage à faire dans `general.lua` : l'en-tête « remplace l'ancien… `trancate` » et le bloc « Utilisation côté ore » sont des commentaires de collage, et le commentaire sur le retour de `add_proto` est peu clair.
-- Le commentaire d'exemple lit `rp-placeholder-icons`, mais le setting réel s'appelle « Dev assets » : à aligner (voir ore).
-- Le chemin hors mode dev vise `graphics/items/<nom>.png`, un dossier qui n'existe pas dans assets. Le README d'assets note une autre convention (`graphics/mod_part/part/part.png`) : à trancher, les deux ne coïncident pas.
-- `normalize_name` ne fait que minuscules + espaces → `_`, alors que les ids vanilla ont des tirets (`iron-ore`) et que les données mélangent les deux.
-- **Loader absent** (connu) : rien ne lit les `*_data.lua` d'ore. Les fichiers `utils/ore.lua`, `assets.lua`, `building.lua`, `main.lua`, `function/multi.lua` et `function/world.lua` sont vides. `multi.lua` et `world.lua` ne sont même pas dans le `data.lua` d'utils. => Voir [[TODO.md]]
+- Fonctions présentes : `normalize_name`, `icon_path`, `icons`, `add_proto`, `copy_proto`, `get_settings`. La fonction `trancate` n'existe plus.
+- **`normalize_name` remplace maintenant les espaces par `-`**, alors que le générateur de données (`generate_elements.py`, fonction `norm`) les remplace par `_`. C'est un conflit de convention, voir « Décisions à prendre ».
+- `icon_path` hors mode dev vise `graphics/items/<nom>.png`, un dossier qui n'existe pas dans assets. Le README d'assets ne documente aucune autre arborescence.
+- Ménage dans `general.lua` : l'en-tête (« remplace l'ancien… `trancate` ») et le bloc « Utilisation côté ore » sont des commentaires de collage. L'exemple cite un setting `rp-placeholder-icons` alors que le setting réel s'appelle « Dev assets ».
+- `data.lua` fait `require` de `utils.general`, `utils.building`, `utils.ore`, `utils.assets` et `utils.main`. Charger un fichier vide ne produit pas d'erreur. `function/multi.lua` et `function/world.lua` (vides) ne sont pas chargés.
+- Vides : `utils/ore.lua`, `assets.lua`, `building.lua`, `main.lua`, `function/multi.lua`, `function/world.lua`, `control.lua`, `settings.lua`.
 - Les autres mods doivent faire `require("__realistic_production_utils__.utils.general")` : à noter dans un README.
 
 ## ore
 
 **Chargement**
 
-- `data.lua` vide (connu) et `prototypes/dev.lua` vide.
-- Locale entièrement vide, sans sections `[mod-setting-name]` ni `[mod-setting-description]`. Les noms `name_en` / `name_fr` sont déjà dans les données.
+- `data.lua` (0 octet), `prototypes/dev.lua` (vide) et tous les stubs (`control`, `data-updates`, `data-final-fixes`, `settings-*`) sont vides.
+- Les données sont rangées en `prototypes/resources/` (`resources_data`, `composition_data`, `elements_data`), `prototypes/materials/` (`alloys_data`, `materials_data`), `prototypes/components/` (`components_data`) et `prototypes/groups/` (`groups_data`). `elements_data` est dans `resources/` alors que ce sont des matériaux.
+- Locale : les deux `config.cfg` ont des sections vides (`[item-name]`, `[recipe-name]`…), sans entrée et sans `[mod-setting-name]` ni `[mod-setting-description]`. Les `name_en` / `name_fr` sont déjà dans les données.
 
 **Settings** (`settings.lua`)
 
-- « Dev assets » : id avec espace, sans préfixe, sans `order`, noms en dur au lieu de la locale, et `per_user` n'existe pas pour un setting (sans effet à ma connaissance). Même chose pour « Allow pure ore nodes » et « Ore density multiplier » (aucun code ne les lit encore). Proposition : `rp-dev-assets`, `rp-pure-ore-nodes`, `rp-ore-density`.
-- Les blocs d'exemples commentés peuvent partir.
+- Trois settings : « Dev assets », « Allow pure ore nodes », « Ore density multiplier ».
+- Ids avec espaces et sans préfixe ; « Dev assets » n'a pas de `order` et utilise `per_user`, qui n'existe pas pour un setting (sans effet à ma connaissance). Les noms sont écrits en dur au lieu de la locale. Proposition : `rp-dev-assets`, `rp-pure-ore-nodes`, `rp-ore-density`.
+- Rien ne lit encore ces settings. Les blocs d'exemples commentés peuvent partir.
 
-**Données** (générées par `generate_elements.py`, qui n'est dans aucun des 5 repos)
+**Données** (générées par `proto_table/generate_elements.py` depuis `elements.xlsx`)
 
-- 88 ressources (62 minerais, 19 roches, 5 fluides, 2 gaz), 118 éléments (88 naturels, 28 artificiels, 2 sans `origin` : astatine et francium), 5 alliages.
-- 115 lignes de composition, qui ne couvrent que **44 ressources sur 88**. Sans composition :
-  - roches (19) : granite, basalt, gabbro, diorite, rhyolite, andesite, peridotite, kimberlite, limestone, dolomite, sandstone, clay, shale, chalk, marble, gneiss, quartzite, slate, stone
-  - minerais (19) : iron-ore, copper-ore, bauxite, wolframite, pentlandite, laterite, lepidolite, coltan, monazite, bastnasite, carnotite, uranium-ore, apatite, coal, lignite, anthracite, peat, oil_sand, oil_shale
-  - fluides (5) et gaz : crude-oil, water, seawater, lithium_brine, geothermal_water, natural_gas
-- Conséquences :
-  - **nickel** (basic) n'a aucune source, donc l'acier inoxydable est impossible ; pentlandite et laterite sont sans composition ;
-  - **phosphore** (basic) n'a aucune source (apatite sans composition) ;
-  - **aluminium** et **silicium** (basic) ne viennent que de minéraux `advanced` (spodumène, béryl, zircon), alors que la bauxite (basic) et les roches siliceuses n'ont pas de composition ;
-  - 47 éléments naturels n'ont aucune source (lanthanides, platinoïdes, tantale, niobium, vanadium…) ; monazite, bastnasite et coltan en couvriront une partie dès qu'ils auront une composition. Les 28 artificiels sans source sont normaux.
-- Niveaux incohérents :
-  - étain `advanced`, alors que la cassitérite et le bronze (qui en contient) sont `basic` ;
-  - thorium et uranium `advanced`, alors que leurs seules sources (thorianite, uraninite) sont `experimental` ;
-  - aluminium et silicium `basic` pour des sources `advanced` (voir plus haut).
-- Noms : `iron-ore`, `copper-ore`, `uranium-ore`, `crude-oil` ont des tirets, tout le reste des underscores (`oil_sand`, `native_gold`, `stainless_steel`…). Prévoir une règle et un mapping vers les ids vanilla.
-- Ids qui existent déjà dans le jeu : `iron-ore`, `copper-ore`, `uranium-ore`, `coal`, `stone`, `crude-oil`, `water`. Probablement aussi `sulfur`, `carbon`, `lithium`, `fluorine` (Space Age). À vérifier dans `data.raw`, car `add_proto` ignore les doublons en silence (juste un `log`).
+| Table | Lignes | Remarque |
+| --- | --- | --- |
+| resources | 88 | 62 minerais, 19 roches, 5 fluides, 2 gaz ; 7 ressources vanilla ; 23 avec `associated_with` |
+| elements | 118 | 88 naturels, 28 artificiels, 2 sans `origin` (astate, francium) ; 13 fluides, 105 items |
+| composition | 115 | couvre **44 ressources sur 88** |
+| alloys | 5 | quantités remplies (acier 3 fer + 1 carbone, bronze 4 cuivre + 1 étain, laiton 3 cuivre + 2 zinc, duralumin 6/2/1/1, acier inox 5/3/1/1) |
+| materials | 0 | vide |
+| components | 0 | vide |
+
+Les niveaux (`level`) sont remplis partout : ressources 54 basic / 30 advanced / 4 experimental ; éléments 21 / 62 / 35 ; alliages 2 / 2 / 1. Les compositions sont cohérentes (sommes entre 99,5 et 100,5 % pour les 44 ressources couvertes).
+
+*Ressources sans composition (44)*
+
+- 19 roches : granite, basalt, gabbro, diorite, rhyolite, andesite, peridotite, kimberlite, limestone, dolomite, sandstone, clay, shale, chalk, marble, gneiss, quartzite, slate, stone
+- 19 minerais : iron-ore, copper-ore, bauxite, wolframite, pentlandite, laterite, lepidolite, coltan, monazite, bastnasite, carnotite, uranium-ore, apatite, coal, lignite, anthracite, peat, oil_sand, oil_shale
+- 6 fluides et gaz : crude-oil, water, seawater, lithium_brine, geothermal_water, natural_gas
+
+*Conséquences*
+
+- **47 éléments naturels sur 88 n'ont aucune source** : phosphore, nickel, scandium, vanadium, gallium, germanium, sélénium, brome, rubidium, strontium, yttrium, niobium, ruthénium, rhodium, palladium, cadmium, indium, tellure, iode, césium, baryum, les lanthanides (de lanthane à lutécium, sauf prométhium), hafnium, tantale, rhénium, osmium, iridium, thallium, bismuth, polonium, radon, radium, actinium, protactinium. Monazite, bastnasite, coltan, apatite, pentlandite et latérite en couvriront une partie dès qu'ils auront une composition.
+- **Nickel et phosphore** (niveau basic) n'ont aucune source : l'acier inoxydable est impossible aujourd'hui.
+- Les 28 éléments artificiels sans source sont normaux : ils viendront de la synthèse.
+
+*Niveaux incohérents*
+
+| Élément | Niveau | Problème |
+| --- | --- | --- |
+| aluminium | basic | ses seules sources sont `advanced` (spodumène, béryl) ; la bauxite (basic) n'a pas de composition |
+| silicium | basic | idem (béryl, spodumène, zircon) ; les roches siliceuses n'ont pas de composition |
+| thorium | advanced | sa seule source (thorianite) est `experimental` |
+| uranium | advanced | sa seule source (uraninite) est `experimental` |
+| étain | advanced | le bronze (basic) en contient 1/5 ; la cassitérite est basic |
+
+**Noms**
+
+- 10 noms avec `_` (`native_gold`, `oil_sand`, `stainless_steel`, `lithium_brine`…) et 4 avec `-` (`iron-ore`, `copper-ore`, `uranium-ore`, `crude-oil`, les ids vanilla).
+- Ids déjà présents dans le jeu : `iron-ore`, `copper-ore`, `uranium-ore`, `coal`, `stone`, `crude-oil`, `water`. Probablement aussi `sulfur`, `carbon`, `lithium`, `fluorine` et, si les noms passent en tirets, `lithium-brine` (Space Age). À vérifier dans `data.raw` : `add_proto` ignore les doublons en silence (un `log` seulement).
 - À prévoir dans les générateurs : les ingrédients d'alliage sont `{ name, amount }` sans `type` (obligatoire dans les recettes en 2.x), et les fluides exigent `base_color` et `flow_color` (tirables de la teinte).
 
 ## building
 
 - Pas de `data.lua`. Les 6 fichiers de `prototypes/` (`entity`, `globals`, `item`, `recipe`, `technologie`, `util`) sont vides, comme les stubs `control` / `data-*` / `settings-*`.
-- `settings.lua` : voir « Bloquant ».
-- Locale vide. `info.json` correct (dépend d'assets et d'utils).
+- `settings.lua` déclare un seul setting `RM-stp-order` (chaîne, caché, valeurs `aw` / `dw`) : son préfixe `RM-` est incohérent avec le reste du mod (`rp-`), il n'a pas de locale et rien ne le lit aujourd'hui.
+- Locale vide. `info.json` correct (dépend d'assets et d'utils). Le fichier `technologie.lua` garde sa faute (`technology`).
 
 ## core (`realistic_production_main`)
 
 - Pas de `data.lua`, tous les stubs vides, `settings.lua` vide, locale vide.
 - `info.json` : la description est celle d'assets (« Graphics and sounds… »). Dépendances correctes (assets, building, ore, utils).
 - Repo `core` mais mod `main` : à unifier si possible avant publication.
-- `TODO.md`, `ROADMAP.md` et `RAPPORT.md` sont à la racine du mod, donc empaquetés dans le zip. Les mettre dans `docs/` ou dans `package.ignore`. Les versions déposées contiennent les erreurs listées plus haut.
 
-## assets
+## Décisions à prendre
 
-- Contenu sain : 4 icônes 64×64 et 4 images 256×256 (1x1, 2x2, 3x3, 3x5), de bons supports pour les teintes.
-- `graphics/README.md` obsolète (il parle de `prototypes/util.lua` et de 32×32). Tu y as noté la nouvelle convention `graphics/mod_part/part/part.png` : à réécrire proprement.
-- `thumbnail.png` est un JPEG 720×380 renommé en `.png`, et c'est le même fichier dans les 5 repos. Le convertir en vrai PNG (144×144 recommandé).
-- À prévoir : une entité `resource` demande des `stages`. Les `_picture` 256×256 sont des images uniques, utilisables en test avec une seule variation.
-
-## Transversal
-
-- Stubs vides : `control.lua`, `data-updates.lua`, `data-final-fixes.lua`, `settings-*.lua` dans building, core et ore (utils : `control.lua` et `settings.lua`). Inoffensifs, à supprimer ou garder pour la suite.
-- Les 5 `changelog.txt` sont au bon format mais identiques, avec le texte générique.
+1. **Convention de noms.** `normalize_name` utilise `-`, le générateur utilise `_`, les ids vanilla utilisent `-`. Si les tirets l'emportent, il faut changer `norm` dans `generate_elements.py` et renommer 10 ressources et alliages, ainsi que leurs références (`composition`, `associated_with`) ; `lithium_brine` deviendrait `lithium-brine`, qui entre probablement en collision avec Space Age.
+2. **Scories et extraction progressive** (voir `RoadMap/Item.md`) : colonnes `primary` dans `composition` et `tech` dans `resources`, un type de scorie unique ou par famille, liste des roches disponibles au départ.
+3. **Niveaux.** Que signifie `level` pour un élément : le niveau du premier procédé qui le libère, ou celui de sa roche ? La mécanique des scories change la réponse.
+4. **Première version des bâtiments.** Machines autonomes reliées par tapis et tuyaux (recommandé dans `machine.md`), ou bâtiments qui demandent d'autres bâtiments pour fonctionner.
+5. **Ressources vanilla.** `iron-ore` et `copper-ore` sont gardés comme minerais génériques ; le sort de `coal`, `stone`, `uranium-ore` dépend de leur existence naturelle (à décider un par un).
 
 ## Priorités
 
-1. Corriger `building/settings.lua`.
-2. Renommer les settings d'ore (`rp-…`) et aligner l'exemple d'`icon_path`.
-3. Loader dans utils et `data.lua` d'ore (en cours).
-4. Compositions : bauxite, pentlandite, laterite, apatite, wolframite, coltan, monazite, bastnasite, lepidolite, roches siliceuses.
-5. Aligner les niveaux (étain, uranium/thorium, aluminium, silicium) et fixer la convention de noms.
-6. assets : README et vrai `thumbnail.png`.
-
----
-
-# Rapport par repo — 22 oct. 2026
-
-Les fichiers vides ne portent pas de nom de repo : je les ai attribués d'après `info.json` et les fichiers uniques (`prototypes/` → ore, `utils/` → utils…). À vérifier si un cas semble mal placé.
-
-## Tous les repos
-
-- Presque tous les fichiers standards sont vides : `control.lua`, `data-updates.lua`, `data-final-fixes.lua`, `settings-*.lua`, `migrations.lua`, tous les `locale/*/config.cfg`. À supprimer tant qu'ils ne servent pas.
-- `migrations.lua` à la racine ne sert à rien : Factorio lit un dossier `migrations/`.
-- Un `settings copy.lua` (doublon) existe en plusieurs exemplaires. `local bool = {}` passé à `data:extend` fait planter le chargement, et `RM-stp-order` n'a ni préfixe cohérent ni locale.
-- `CHANGELOGS.md` ne contient que `---`, doublon de `changelog.txt`.
-- Versions : `main` est en 2.0, les autres en 2.1.
-
-## assets
-
-- **Corriger** : les `icon.png` (iron/copper) sont des fichiers texte, pas des PNG. Factorio plantera dès qu'un prototype les référence.
-- **Corriger** : `graphics/README.md` est obsolète (cite `prototypes/util.lua`, absent, et du 32×32). Les icônes vanilla sont en 64×64.
-- **Corriger** : arborescence `graphics/ores/realistic-iron-ore/icon.png` ≠ chemin attendu par `icon_path`. Les noms `realistic-*` ne correspondent à aucun prototype (`iron-ore` vanilla, `hematite`…).
-- **Ajouter** : icônes de base par forme (roche, minerai, lingot, fluide, gaz) à teinter, plutôt que 88+ PNG ; sons et sprites plus tard.
-- **Retirer** : `control.lua`, `migrations.lua`, `settings*.lua` inutiles pour un mod de ressources graphiques.
-
-## utils
-
-- **Corriger** `icon_path` : variable globale `folder` jamais déclarée, paramètre `mod` ignoré.
-- **Corriger** `trancate` : fonction vide.
-- **Aligner** les noms entre TODO et code : `add_proto`, `copy_proto`, `get_settings`.
-- **Ajouter** tout ce qui est vide : `utils/ore.lua`, `assets.lua`, `building.lua`, `main.lua`, `function/multi.lua`, `function/world.lua`.
-- **Ajouter** un loader des `*_data.lua` générés (c'est le vrai chaînon manquant avec ore).
-- Les autres mods l'utilisent via `require("__realistic_production_utils__.utils.general")` : à documenter dans un README.
-
-## ore
-
-C'est le repo le plus avancé, mais rien n'est encore chargé.
-
-- **Bloquant** : pas de `data.lua`. Les fichiers `prototypes/entity|item|recipe|technologie|globals|util.lua` sont tous vides (`technologie` → `technology`).
-- **Données incomplètes** :
-  - `materials_data` et `components_data` sont vides.
-  - Sans composition : bauxite, wolframite, pentlandite, laterite, lepidolite, coltan, monazite, bastnasite, carnotite, apatite, charbons, tourbe, bitumes, tous les fluides sauf l'air, toutes les roches.
-  - Conséquences : l'aluminium n'a de source que dans des silicates avancés. Le nickel n'a aucune source, donc pas d'acier inoxydable. Le silicium n'a de source qu'avancée alors qu'il est « basic ». Phosphore, vanadium, niobium/tantale et lanthanides n'ont aucune source.
-- **Cohérence** :
-  - Étain `advanced` mais cassitérite et bronze `basic`.
-  - Thorium/uranium `advanced` mais minerais `experimental`.
-  - `astatine` et `francium` sans `origin`.
-  - Mélange `iron-ore` / `native_gold` (tirets/underscores).
-  - `elements_data` est rangé dans `resources/` alors que ce sont des matériaux.
-- **Risques Space Age** : `carbon`, `lithium`, `fluorine`, `sulfur` existent déjà dans le jeu. `add_proto` ignore alors tes versions en silence.
-- **Settings** : « Allow pure ore nodes » et « Ore density multiplier » sans préfixe ni locale, et rien ne les lit encore.
-- **Hors repo** : `generate_elements.py` et le tableur source n'étaient pas dans les fichiers fournis ; il faut les versionner.
-- **Changelog** : daté 2025-11-05, à mettre à jour.
-
-## building
-
-- Tout est à faire : seul `data.lua` existe (vide).
-- **Corriger** le nom `realistic_production_buidling` avant publication (renommer un mod plus tard casse les sauvegardes).
-- À partir de `utils/building.lua` : `create_building`, catégories de craft, `fluid_boxes`, `create_machine`, multiblocs.
-
-## core (`realistic_production_main`)
-
-- `info.json` : `factorio_version` 2.0 et `base >= 2.0.69` (les autres : 2.1), description copiée d'assets, dépendance `buidling` fautive.
-- Aucune logique : `data-updates` / `data-final-fixes` vides. Les fonctions d'intégration vanilla (`remove_resource`, `replace_ingredient`…) n'existent pas non plus.
-- Nom du repo (`core`) ≠ nom du mod (`main`) : à unifier.
-
-## Priorités
-
-1. Faux PNG, `settings copy.lua`, faute `buidling`, `migrations/`.
-2. `data.lua` d'ore + loader dans utils.
-3. Compositions manquantes (aluminium, nickel, silicium, phosphore).
-4. Locale générée + icônes teintées.
+1. Trancher la convention de noms et mettre `generate_elements.py` et `normalize_name` d'accord.
+2. Écrire le loader d'ore (`data.lua`, `utils/ore.lua`) : `load_data`, `create_item`, `create_fluid`, groupes et sous-groupes.
+3. Locale générée depuis `name_en` / `name_fr`, et settings renommés (`rp-…`).
+4. Compositions manquantes : bauxite, pentlandite, latérite, apatite, wolframite, coltan, monazite, bastnasite, lepidolite, roches siliceuses.
+5. Aligner les niveaux (aluminium, silicium, étain, uranium, thorium).
+6. assets : README, arborescence des icônes, miniature.

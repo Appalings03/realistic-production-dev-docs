@@ -116,7 +116,7 @@ def clean(value):
 
 
 def norm(value) -> str:
-    return str(value).strip().lower().replace(" ", "_")
+    return str(value).strip().lower().replace(" ", "-")
 
 
 def to_number(value, label, where, errors, integer=False):

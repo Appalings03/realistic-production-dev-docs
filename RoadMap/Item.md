@@ -1,3 +1,4 @@
+
 # Items et chaînes de production
 
 > Document de conception pour Realistic Production, ciblant Factorio 2.1. Les propositions ci-dessous ne modifient pas le code. Les noms déjà présents dans `proto_table` sont des données de départ ; les recettes et rendements restent à équilibrer.
@@ -79,35 +80,35 @@ Les 118 éléments ne doivent pas tous être requis pour fabriquer les sciences 
 
 Les cinq recettes de `alloys_data.lua` sont les alliages de base de départ. Leurs proportions sont des ratios de jeu à équilibrer, pas des consignes métallurgiques exactes.
 
-| Alliage | Ingrédients conceptuels | Priorité |
-|---|---|---|
-| Acier | Fer + carbone | Avancée |
-| Bronze | Cuivre + étain | De base |
-| Laiton | Cuivre + zinc | De base |
-| Duralumin | Aluminium + cuivre + magnésium + manganèse | Expérimentale dans les données actuelles |
-| Acier inoxydable | Fer + chrome + nickel + carbone | Avancée |
+| Alliage          | Ingrédients conceptuels                     | Priorité                                  |
+| ---------------- | -------------------------------------------- | ------------------------------------------ |
+| Acier            | Fer + carbone                                | Avancée                                   |
+| Bronze           | Cuivre + étain                              | De base                                    |
+| Laiton           | Cuivre + zinc                                | De base                                    |
+| Duralumin        | Aluminium + cuivre + magnésium + manganèse | Expérimentale dans les données actuelles |
+| Acier inoxydable | Fer + chrome + nickel + carbone              | Avancée                                   |
 
 ### Alliages proposés dans la liste initiale
 
 À ajouter au registre après vérification de leur intérêt ludique et de la disponibilité de leurs éléments :
 
-| Alliage | Éléments constitutifs |
-|---|---|
-| Or blanc | Or + nickel et/ou palladium/argent |
-| Amalgame dentaire | Mercure + argent + étain + cuivre |
-| Magnalium | Aluminium + magnésium |
-| Stellite | Cobalt + chrome + tungstène |
-| Invar | Fer + nickel |
-| Monel | Nickel + cuivre |
-| Nichrome | Nickel + chrome |
-| Cupronickel | Cuivre + nickel |
-| Étain de potier (pewter) | Étain + cuivre + antimoine |
-| Zamak | Zinc + aluminium + magnésium + cuivre |
-| Bêta-titane | Titane + molybdène + aluminium + vanadium |
-| Hastelloy | Nickel + molybdène + chrome + fer |
-| Inconel | Nickel + chrome + fer |
-| Tombac | Cuivre + zinc |
-| Électrum | Or + argent |
+| Alliage                   | Éléments constitutifs                    |
+| ------------------------- | ------------------------------------------ |
+| Or blanc                  | Or + nickel et/ou palladium/argent         |
+| Amalgame dentaire         | Mercure + argent + étain + cuivre         |
+| Magnalium                 | Aluminium + magnésium                     |
+| Stellite                  | Cobalt + chrome + tungstène               |
+| Invar                     | Fer + nickel                               |
+| Monel                     | Nickel + cuivre                            |
+| Nichrome                  | Nickel + chrome                            |
+| Cupronickel               | Cuivre + nickel                            |
+| Étain de potier (pewter) | Étain + cuivre + antimoine                |
+| Zamak                     | Zinc + aluminium + magnésium + cuivre     |
+| Bêta-titane              | Titane + molybdène + aluminium + vanadium |
+| Hastelloy                 | Nickel + molybdène + chrome + fer         |
+| Inconel                   | Nickel + chrome + fer                      |
+| Tombac                    | Cuivre + zinc                              |
+| Électrum                 | Or + argent                                |
 
 **Point de conception :** le mercure et les alliages contenant des substances toxiques doivent apparaître tard dans la progression chimique, avec une représentation et des recettes lisibles, sans ajouter de mécanique de danger obligatoire avant d’avoir une conception claire.
 
@@ -147,8 +148,48 @@ La refonte doit couvrir les recettes qui utilisent les ressources remplacées, e
 - Uranium : minerai identifié, concentration et raffinage avant les produits nucléaires ; conserver une branche tardive.
 - Recettes vanilla : remplacer leurs ingrédients en préservant les paliers de recherche, les usages logistiques et l’équilibre global.
 
+## 7. Extraction progressive et scories
+
+Le joueur ne reçoit pas tout d'une roche dès le départ. La progression se fait en trois temps :
+
+1. **Début de partie** : seules certaines roches sont extractibles. Les autres sont verrouillées par une technologie (colonne `tech` de la feuille `resources` ; vide = disponible dès le départ).
+2. **Raffinage basique** : le traitement d'une roche ne donne que son élément principal. Tout le reste devient des **scories**.
+3. **Retraitement** : des technologies permettent de retraiter les scories (béton, ciment) et d'extraire les autres éléments de la roche brute.
+
+C'est proche de la métallurgie réelle, où les scories de haut fourneau sont valorisées en ciment.
+
+### Élément principal
+
+Ne pas prendre « l'élément au plus fort pourcentage » : dans les oxydes, les sulfates et les sulfures, l'oxygène ou le soufre arrivent souvent en tête.
+
+| Minéral     | Composition (% en masse)                                           | « Le plus présent » donnerait |
+| ------------ | ------------------------------------------------------------------ | -------------------------------- |
+| chalcopyrite | soufre 34,94 · cuivre 34,63 · fer 30,43                          | du soufre, pas du cuivre         |
+| pyrite       | soufre 53,45 · fer 46,55                                          | du soufre                        |
+| gypse        | oxygène 55,76 · calcium 23,28 · soufre 18,62 · hydrogène 2,34 | de l'oxygène                    |
+| hématite    | fer 69,94 · oxygène 30,06                                        | du fer (correct)                 |
+
+Il faut donc une colonne **`primary`** (yes/no) dans la feuille `composition`, remplie à la main (ou pré-remplie puis corrigée). Avec la règle actuelle, une ressource a un seul élément `primary` ; à décider si certaines en auront plusieurs (la chalcopyrite pourrait garder cuivre et fer).
+
+### Scories
+
+- À décider : un seul item `slag`, ou une scorie par famille (fer, cuivre, aluminium…). Une scorie par famille permet de récupérer des éléments différents au retraitement.
+- Usage de départ : béton et matériaux de construction (voir « Remplacement des objets vanilla », pierre).
+- Les éléments secondaires récupérés au retraitement sont ceux de la colonne `composition` qui ne sont pas `primary`.
+- Les scories sont des items solides : elles occupent de la place et se stockent, ce qui donne une raison logistique à les valoriser.
+
+### Conséquences sur les données
+
+- Feuille `resources` : colonne `tech` (technologie qui déverrouille la roche).
+- Feuille `composition` : colonne `primary`.
+- `level` d'un élément : à redéfinir comme le niveau du premier procédé qui le libère. Aujourd'hui, aluminium et silicium sont `basic` alors que toutes leurs sources sont `advanced`, et thorium et uranium sont `advanced` pour des sources `experimental`.
+- Les recettes de raffinage basique peuvent être **générées** depuis `composition` et `primary` ; seules les recettes de retraitement demandent un travail à la main.
+- Règle de non-blocage : les roches disponibles au départ doivent suffire à fabriquer les premiers packs de science (voir `tech.md`).
+
 ## Points restant à décider
 
+- Quelles roches sont disponibles au départ, et lesquelles sont verrouillées.
+- Une scorie unique ou une scorie par famille.
 - Quantités et rendements de chaque étape, y compris la fréquence des sous-produits.
 - Quels minerais doivent être nécessaires à la progression principale et lesquels sont facultatifs.
 - Quels éléments sont fluides, poudres ou lingots dans l’interface du jeu.
