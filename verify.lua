@@ -265,6 +265,7 @@ if #issues > 0 then
             issue.message
         ))
     end
+---@diagnostic disable-next-line: undefined-global
     os.exit(1)
 end
 

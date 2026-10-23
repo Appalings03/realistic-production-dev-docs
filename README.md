@@ -26,13 +26,13 @@ Centraliser tout ce qui concerne :
 
 ## Contexte du projet
 
-Le mod est pensé comme une suite de plusieurs repos, avec une séparation claire des responsabilités :
+Le projet est réparti en cinq mods Factorio, chacun avec une responsabilité distincte. Les descriptions ci-dessous distinguent le rôle prévu du contenu actuellement présent dans le workspace : plusieurs parties sont encore en construction.
 
-- `realistic_production_assets` : graphismes et sons ;
-- `realistic_production_utils` : fonctions et helpers partagés ;
-- `realistic_production_ore` : roches, minerais, fluides, éléments, alliages ;
-- `realistic_production_building` : machines et multiblocs ;
-- `realistic_production_core` : mod principal d'intégration et orchestration.
+- [`realistic_production_assets`](https://github.com/Appalings03/realistic-production-assets) — Fournit les ressources graphiques et sonores partagées par les autres mods : icônes, images d'entités, sprites et sons. Le dépôt contient actuellement des images de développement dans `graphics/dev/` ; les ressources finales restent à compléter.
+- [`realistic_production_utils`](https://github.com/Appalings03/realistic-production-utils) — Regroupe les fonctions communes afin d'éviter de dupliquer les mêmes helpers dans `ore`, `building` et `core`. `utils/general.lua` contient notamment la normalisation des noms, la construction des chemins d'icônes et des helpers pour ajouter ou copier des prototypes et lire les settings. Les autres modules (`ore`, `building`, `assets`, `main`, multiblocs et monde) sont encore des squelettes.
+- [`realistic_production_ore`](https://github.com/Appalings03/realistic-production-ore) — Porte les données et, à terme, les prototypes liés aux roches, minerais, fluides, éléments, matériaux et alliages, ainsi que leurs groupes et compositions. Les tables de données sont présentes dans `prototypes/`, mais leur chargement et la génération des prototypes de jeu restent à mettre en place.
+- [`realistic_production_building`](https://github.com/Appalings03/realistic-production-building) — Accueillera les machines de production, leurs objets, recettes, technologies, catégories de fabrication et éventuels multiblocs. Les fichiers de prototypes présents sont actuellement vides : cette partie est à développer.
+- [`realistic_production_core`](https://github.com/Appalings03/realistic-production-core) — Mod principal destiné à assembler les modules et à intégrer leurs chaînes au jeu de base, notamment en adaptant les recettes, ressources et technologies vanilla. Il déclare les dépendances vers les autres mods, mais sa logique d'intégration est encore à implémenter.
 
 L'objectif fonctionnel est de créer un système de production plus réaliste, avec des chaînes de transformation qui partent des matières brutes pour aller vers les ressources finales, en s'appuyant sur des éléments, des fluides, des recettes et des technologies cohérentes.
 
