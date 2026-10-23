@@ -15,14 +15,24 @@ Centraliser tout ce qui concerne :
 
 ## Structure du dossier
 
-- `README.md` : vue d'ensemble du dossier de dev docs.
-- `ROADMAP.md` : plan de développement global du projet, par phases et par repo.
-- `TODO.md` : backlog, tâches à faire et points bloquants.
-- `RAPPORT.md` : synthèse et analyse technique de l'état actuel des repos.
-- `verify.lua` : script de validation rapide des prototypes chargés.
-- `jpeg2png.py` : petit utilitaire pour convertir une image JPEG en PNG.
-- `RoadMap/` : documents de planification et fichiers de travail liés à la roadmap.
-- `proto_table/` : tables de données et références utiles pour la génération de prototypes.
+- [`README.md`](./README.md) : vue d'ensemble du dossier de dev docs.
+- [`ROADMAP.md`](./ROADMAP.md) : plan de développement global du projet, par phases et par repo.
+- [`TODO.md`](./TODO.md) : backlog, tâches à faire et points bloquants.
+- [`RAPPORT.md`](./RAPPORT.md) : synthèse et analyse technique de l'état actuel des repos.
+- [`verify.lua`](./verify.lua) : script de validation rapide des prototypes chargés.
+- [`jpeg2png.py`](./jpeg2png.py) : petit utilitaire pour convertir une image JPEG en PNG.
+- [`RoadMap/`](./RoadMap/) : documents de planification et fichiers de travail liés à la roadmap.
+- [`proto_table/`](./proto_table/) : tables de données et références utiles pour la génération de prototypes.
+
+### Documents de conception complémentaires
+
+- [`Item.md`](./RoadMap/Item.md) : notes sur les objets et les ressources.
+- [`machine.md`](./RoadMap/machine.md) : notes de conception des machines.
+- [`tech.md`](./RoadMap/tech.md) : notes sur les technologies.
+- [`FactorioMod_techtree.drawio`](./RoadMap/FactorioMod_techtree.drawio) : schéma de l'arbre technologique.
+- [`blender_models_checklist.md`](./RoadMap/blender_models_checklist.md) : checklist des modèles à produire avec Blender.
+- [`generate_elements.py`](./proto_table/generate_elements.py) : script de génération des tables de données.
+- [`elements.xlsx`](./proto_table/elements.xlsx) : tableur source des éléments.
 
 ## Contexte du projet
 
@@ -48,9 +58,9 @@ Les documents de ce dossier montrent que le projet est encore en phase de fondat
 
 ## Utilisation pratique
 
-1. Lire `ROADMAP.md` pour comprendre la vision globale.
-2. Consulter `TODO.md` pour la liste des tâches actives / priorisées.
-3. Vérifier les dernières conclusions dans `RAPPORT.md`.
+1. Lire [`ROADMAP.md`](./ROADMAP.md) pour comprendre la vision globale.
+2. Consulter [`TODO.md`](./TODO.md) pour la liste des tâches actives / priorisées.
+3. Vérifier les dernières conclusions dans [`RAPPORT.md`](./RAPPORT.md).
 4. Lancer `lua verify.lua` depuis ce dossier pour simuler l'enregistrement des définitions de `ore` et afficher les problèmes par prototype. Le script vérifie la structure et les références des données ; il ne remplace pas un lancement dans Factorio.
 5. Garder ce dossier comme mémoire technique et historique de développement.
 
