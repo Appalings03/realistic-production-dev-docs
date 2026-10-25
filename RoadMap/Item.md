@@ -183,13 +183,15 @@ Décidé le 23 oct. 2026 : **un seul type de scorie**, comme des cendres.
 
 - Feuille `resources` : colonne `tech` (technologie qui déverrouille la roche).
 - Feuille `composition` : colonne `primary`.
-- `level` d'un élément : à redéfinir comme le niveau du premier procédé qui le libère. Aujourd'hui, aluminium et silicium sont `basic` alors que toutes leurs sources sont `advanced`, et thorium et uranium sont `advanced` pour des sources `experimental`.
+- `level` d'un élément : palier du premier procédé qui le libère. Les niveaux sont alignés sur les sources/procédés retenus : aluminium et silicium `advanced`, thorium et uranium `experimental`, étain `basic` (cassitérite et bronze `basic`).
 - Les recettes de raffinage basique peuvent être **générées** depuis `composition` et `primary` ; seules les recettes des procédés avancés demandent un travail à la main.
 - Règle de non-blocage : les roches disponibles au départ doivent suffire à fabriquer les premiers packs de science (voir `tech.md`).
 
-### Ressources disponibles au départ (proposition)
+### Ressources disponibles au départ (décision du 25 oct. 2026)
 
-Les 88 ressources sont réparties en cinq paliers de déblocage. La colonne `tech` de `resources` porte la technologie du palier ; elle reste vide pour le palier de départ. Les paliers suivent le `level` actuel du tableur (54 basic, 30 advanced, 4 experimental).
+Les huit ressources de départ sont validées. `iron-ore` et `copper-ore` désignent les produits vanilla récupérés depuis des roches adaptées ; ils ne signifient pas que le joueur extrait directement ces minerais vanilla comme des gisements autonomes. Au début, le traitement d'une roche récupère le minerai principal visé et transforme ses autres constituants en scories. Les rendements chiffrés restent à équilibrer.
+
+Les autres ressources pourront être réparties en paliers de prospection. La colonne `tech` de `resources` et les technologies précises restent à définir avec les recettes et les machines ; les paliers indiqués ci-dessous sont des propositions de travail et suivent le `level` actuel des ressources (54 basic, 30 advanced, 4 experimental).
 
 | Palier | Ressources | Nombre |
 | --- | --- | --- |
@@ -208,19 +210,18 @@ Pourquoi ce départ :
 
 ## 8. Items déjà présents dans le jeu
 
-Question posée le 23 oct. : faut-il créer des prototypes qui existent déjà ? **Non, il vaut mieux les réutiliser.**
+Décision du 25 oct. 2026 : les sept prototypes vanilla existants sont **réutilisés**, pas recréés.
 
 - Sept ressources sont marquées `vanilla = yes` : `stone`, `iron-ore`, `copper-ore`, `uranium-ore`, `coal`, `crude-oil`, `water`. Le loader ne crée pas leur item ou leur fluide. Les recettes, technologies et mods qui les utilisent continuent de fonctionner, et il n'y a ni doublon ni icône à refaire.
-- Ce qui change pour elles se règle dans `data-final-fixes` (sous-groupe, ordre, gisements, recettes de raffinage), sans recréer le prototype.
-- Tout ce qui n'existe pas dans le jeu est créé avec le préfixe `rp-` (décision du 23 oct., à valider : voir `TODO.md`).
+- Les IDs vanilla `iron-ore` et `copper-ore` sont les produits de départ récupérés depuis des roches adaptées. Le raffinage initial ne récupère que le minerai ciblé ; les autres constituants deviennent des scories. Les rendements exacts et les procédés qui récupèrent les constituants secondaires seront définis plus tard.
+- Ce qui change pour ces prototypes se règle dans `data-final-fixes` (sous-groupe, ordre, gisements, recettes de raffinage), sans recréer le prototype.
+- Tout ce qui n'existe pas dans le jeu est créé avec le préfixe `rp-` (décision confirmée le 25 oct. 2026). Les tables de données gardent les noms courts ; le loader préfixera les IDs des prototypes.
 - Certains éléments ont déjà un équivalent : `sulfur` probablement, `carbon`, `lithium` et `fluorine` avec Space Age (à vérifier dans `data.raw`). Proposition : réutiliser ceux du jeu de base, créer des `rp-` pour les autres, et trancher pour Space Age avec l'extension. Cela demande une colonne `vanilla` dans la feuille `elements`.
-- `iron-ore` et `copper-ore` sont des minerais génériques sans composition : à décider s'ils donnent 100 % de métal ou une part de scories.
 
 ## Points restant à décider
 
 - Valider les paliers de déblocage des ressources (section 7).
 - Quantité de scories par recette de raffinage basique.
-- Ce que donnent `iron-ore` et `copper-ore` au raffinage (section 8).
 - Quantités et rendements de chaque étape, y compris la fréquence des sous-produits.
 - Quels minerais doivent être nécessaires à la progression principale et lesquels sont facultatifs.
 - Quels éléments sont fluides, poudres ou lingots dans l’interface du jeu.

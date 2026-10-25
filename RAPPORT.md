@@ -4,13 +4,19 @@ Fondé sur la lecture des fichiers de chaque repo au 24 oct. 2026 (commits : ass
 
 **Limites** : rien n'a été lancé dans Factorio et `verify.lua` n'a pas été exécuté. Les erreurs de chargement annoncées sont déduites du code, pas testées. Ce fichier remplace toutes les versions précédentes du rapport.
 
+## Mise à jour — décisions confirmées le 25 oct. 2026
+
+Les quatre décisions de la section 0 du TODO sont désormais tranchées : les sept prototypes vanilla sont réutilisés ; fer et cuivre sont récupérés dès le départ depuis des roches adaptées et les constituants secondaires deviennent des scories ; les huit ressources de départ sont celles listées dans `RoadMap/Item.md` ; `level` désigne le palier du premier procédé qui libère l'élément (Al/Si `advanced`, Th/U `experimental`, Sn `basic`). Les technologies précises de raffinage restent reportées jusqu'à la conception des recettes et des machines.
+
+Le diagnostic ci-dessous décrit l'état observé le 24 oct. 2026 ; ses listes de décisions et incohérences reflètent cet état antérieur.
+
 ## En bref
 
 - Le projet est en phase de **fondations**. Les cinq mods ne définissent encore aucun prototype de jeu (items, entités, recettes) : seuls ore et building déclarent des settings.
 - Aucun bloquant de chargement n'a été trouvé. L'ancien bloquant (`building/settings.lua` avec `local bool = {}`) est corrigé.
 - Le manque principal est le **loader** : `ore/data.lua` est vide, donc les 6 fichiers de données générés ne sont lus par personne.
 - Les données sont complètes dans leur structure mais incomplètes dans leur contenu : 44 ressources sur 88 ont une composition.
-- Décisions du 23 oct. : noms avec `-`, préfixe `rp-`, scorie unique, bâtiments reportés. Il reste à trancher les roches de départ, les items déjà présents dans le jeu et le sens de `level` (voir « Décisions à prendre »).
+- Décisions des 23 et 25 oct. : noms avec `-`, préfixe `rp-` pour les prototypes non-vanilla, scorie unique, bâtiments reportés, ressources vanilla et de départ, et sens de `level` (voir les mises à jour ci-dessus).
 
 ## État par repo
 
@@ -109,9 +115,9 @@ Les niveaux (`level`) sont remplis partout : ressources 54 basic / 30 advanced /
 - `info.json` : la description est celle d'assets (« Graphics and sounds… »). Dépendances correctes (assets, building, ore, utils).
 - Repo `core` mais mod `main` : à unifier si possible avant publication.
 
-## Décisions à prendre
+## Décisions à prendre au 24 oct. (état antérieur aux décisions ci-dessus)
 
-**Décidées le 23 oct. :** noms avec `-` ; préfixe `rp-` (règle exacte à valider, voir `TODO.md`) ; scorie unique et inerte (ciment, béton) ; bâtiments reportés après l'assemblage des prototypes.
+**Décidées les 23 et 25 oct. :** noms avec `-` ; préfixe `rp-` pour les prototypes non-vanilla (les tables gardent les noms courts et le loader ajoute le préfixe) ; scorie unique et inerte (ciment, béton) ; bâtiments reportés après l'assemblage des prototypes.
 
 **Restent à décider :**
 
@@ -242,7 +248,7 @@ Les niveaux (`level`) sont remplis partout : ressources 54 basic / 30 advanced /
 - `info.json` : la description est celle d'assets (« Graphics and sounds… »). Dépendances correctes (assets, building, ore, utils).
 - Repo `core` mais mod `main` : à unifier si possible avant publication.
 
-## Décisions à prendre
+## Décisions à prendre au 24 oct. (état antérieur aux décisions ci-dessus)
 
 1. **Convention de noms.** `normalize_name` utilise `-`, le générateur utilise `_`, les ids vanilla utilisent `-`. Si les tirets l'emportent, il faut changer `norm` dans `generate_elements.py` et renommer 10 ressources et alliages, ainsi que leurs références (`composition`, `associated_with`) ; `lithium_brine` deviendrait `lithium-brine`, qui entre probablement en collision avec Space Age.
 2. **Scories et extraction progressive** (voir `RoadMap/Item.md`) : colonnes `primary` dans `composition` et `tech` dans `resources`, un type de scorie unique ou par famille, liste des roches disponibles au départ.
@@ -256,5 +262,5 @@ Les niveaux (`level`) sont remplis partout : ressources 54 basic / 30 advanced /
 2. Écrire le loader d'ore (`data.lua`, `utils/ore.lua`) : `load_data`, `create_item`, `create_fluid`, groupes et sous-groupes.
 3. Locale générée depuis `name_en` / `name_fr`, et settings renommés (`rp-…`).
 4. Compositions manquantes : bauxite, pentlandite, latérite, apatite, wolframite, coltan, monazite, bastnasite, lepidolite, roches siliceuses.
-5. Aligner les niveaux (aluminium, silicium, étain, uranium, thorium).
+5. Aligner les niveaux (aluminium, silicium, étain, uranium, thorium) — alignement effectué le 25 oct. (voir la mise à jour en tête).
 6. assets : README, arborescence des icônes, miniature.

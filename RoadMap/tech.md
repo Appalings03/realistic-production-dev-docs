@@ -138,6 +138,7 @@ Les noms exacts varient selon les technologies présentes dans Factorio et les m
 - Les éléments rares peuvent être obtenus comme sous-produits avant le déblocage de leur traitement spécialisé, mais leur usage doit attendre la technologie correspondante.
 - Les technologies de productivité ne doivent pas court-circuiter les étapes matérielles centrales.
 - Vérifier que les technologies vanilla conservées n’exigent pas de recette ou d’ingrédient retiré par le mod.
+- Les technologies exactes de déblocage des procédés de raffinage seront définies avec les recettes et les machines ; le tableau de progression ci-dessous reste une proposition de travail.
 
 ## Roches verrouillées, scories et procédés avancés
 
@@ -153,7 +154,7 @@ Ces technologies portent la progression d'extraction décrite dans `Item.md` (se
 
 Règles :
 
-- Le jeu doit démarrer avec au moins une roche extractible par famille utile aux premiers packs de science (fer, cuivre, pierre, charbon). Aucune roche de départ ne doit demander une recherche fabriquée avec ses propres produits. Proposition de départ : 8 ressources, détail des paliers dans `Item.md`, section 7.
+- Décision du 25 oct. 2026 : les huit ressources de départ sont `stone`, `clay`, `limestone`, `sandstone`, `iron-ore`, `copper-ore`, `coal` et `water`. Le fer et le cuivre sont récupérés depuis des roches adaptées ; au début, les constituants secondaires deviennent des scories. Aucune ressource de départ ne doit demander une recherche fabriquée avec ses propres produits.
 - Une roche verrouillée a une seule technologie (colonne `tech`) ; cette technologie ne demande que des packs fabricables avec les roches déjà disponibles.
 - La scorie est unique et inerte. Elle ne bloque jamais une machine pleine : prévoir un moyen de la stocker ou de la consommer (ciment, béton) à coût raisonnable, dès le début.
 

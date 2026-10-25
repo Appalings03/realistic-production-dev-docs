@@ -13,7 +13,7 @@ Une feuille = une table Lua :
 et groups_data.lua (groupes + sous-groupes du menu de craft).
 
 Règles :
-- name       : obligatoire, normalisé (minuscules, espaces -> "_"), unique
+- name       : obligatoire, normalisé (minuscules, espaces et "_" -> "-"), unique
                sur l'ensemble des feuilles (les noms vanilla gardent leur tiret)
 - level      : basic / advanced / experimental (vide = avertissement)
 - kind       : resources, ore / rock / fluid / gas (fluid et gas -> type fluid)
@@ -116,7 +116,7 @@ def clean(value):
 
 
 def norm(value) -> str:
-    return str(value).strip().lower().replace(" ", "-")
+    return str(value).strip().lower().replace(" ", "-").replace("_", "-")
 
 
 def to_number(value, label, where, errors, integer=False):

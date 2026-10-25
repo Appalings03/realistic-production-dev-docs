@@ -11,7 +11,7 @@ Objectif : des chaînes de production plus réalistes — roche brute → minera
 - **Extraction progressive** : au début, certaines roches ne sont pas extractibles. Le raffinage basique d'une roche ne garde que son élément principal et le reste devient des scories. Il n'existe qu'**un seul type de scorie**, inerte, comme des cendres : elle ne sert qu'à faire du ciment, du béton ou d'autres matériaux inertes. Les autres éléments s'obtiennent avec des procédés avancés appliqués à la roche brute. Détails dans `RoadMap/Item.md`.
 - **Gisements mixtes** : un patch peut contenir plusieurs minerais ou roches souvent associés dans la réalité (`associated_with`).
 - **Bâtiments débloqués par la recherche** : chaque machine est liée à une technologie. Certains bâtiments demanderont d'autres bâtiments pour fonctionner ; ce sujet est reporté jusqu'à ce que l'assemblage des prototypes fonctionne (voir `RoadMap/machine.md`).
-- **Noms** : tirets (`-`), jamais de `_`. Tout prototype créé par le mod porte le préfixe `rp-` (à valider) ; les ids du jeu de base réutilisés ne sont pas préfixés.
+- **Noms** : tirets (`-`), jamais de `_`. Les noms des prototypes créés par le mod portent le préfixe `rp-` ; les IDs vanilla réutilisés ne sont pas préfixés. Les tables de données conservent les noms courts et le loader applique le préfixe.
 - **Alliages simplifiés** : acier, bronze, laiton, duralumin, acier inoxydable.
 - **Ressources vanilla** : `iron-ore` et `copper-ore` restent comme minerais génériques ; les sept ressources déjà présentes dans le jeu sont réutilisées, pas recréées (voir `RoadMap/Item.md`, section 8).
 - **Space Age** : hors périmètre tant que les phases 1 à 5 ne sont pas stables.
@@ -37,10 +37,10 @@ Dépendances : `assets` et `utils` ne dépendent que de `base` ; `ore` et `build
 - [X] Niveaux (`level`) et quantités d'alliages remplis
 - [X] Nettoyage : faute `buidling`, versions 2.1, `bool = {}` retiré des settings de building
 - [X] **Convention de noms décidée** (23 oct.) : tirets et préfixe `rp-`
-- [ ] Appliquer la convention : `norm` du générateur (une ligne), régénérer, renommer les settings
+- [X] Normaliser les noms du générateur en tirets et régénérer les tables ; convention `rp-` décidée pour les prototypes non-vanilla (le renommage des settings reste à faire avec leur locale)
 - [X] **Scorie unique** décidée (23 oct.)
-- [ ] **Définition du `level`** d'un élément et alignement des 5 cas incohérents (à décider)
-- [ ] Roches disponibles au départ (proposition dans `Item.md`, section 7)
+- [X] **Définition du `level`** d'un élément : palier du premier procédé qui le libère ; Al/Si `advanced`, Th/U `experimental`, Sn `basic`
+- [X] Ressources disponibles au départ : les 8 ressources de `Item.md`, section 7 ; fer et cuivre proviennent de roches adaptées
 - [ ] Colonnes `primary` (composition), `tech` (resources) et `vanilla` (elements) dans le tableur et le générateur
 
 ## Phase 1 — Ore jouable *(prochaine étape)*

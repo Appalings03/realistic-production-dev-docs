@@ -1,6 +1,6 @@
 # TODO — Realistic Production
 
-Mis à jour le 24 oct. 2026 · @Martin
+Mis à jour le 25 oct. 2026 · @Martin
 
 Légende : `[X]` fait (vérifié dans les repos au 24 oct.) · `[~]` fait en partie · `[ ]` à faire
 
@@ -10,18 +10,18 @@ Les détails et les chiffres sont dans `RAPPORT.md`.
 
 ### Prises le 23 oct. 2026
 
-- [~] **Noms avec `-`**, jamais `_`. `normalize_name` (utils) met déjà des `-`. Le générateur ne remplace que les espaces : les 10 noms qui ont un `_` dans le tableur (`geothermal_water`, `lithium_brine`, `native_gold`, `native_platinum`, `native_silver`, `native_sulfur`, `natural_gas`, `oil_sand`, `oil_shale`, `stainless_steel`) sortent encore avec `_`. Correction d'une ligne, testée sur le tableur actuel : dans `norm` de `generate_elements.py`, écrire `.replace(" ", "-").replace("_", "-")`. Le tableur n'a pas besoin d'être modifié et les références (`composition`, `associated_with`) suivent toutes seules.
-- [~] **Préfixe `rp-`**. Proposition à valider : tous les prototypes créés par le mod (items, fluides, groupes, recettes, technologies, entités, settings) prennent `rp-` ; les fichiers de données gardent les noms courts (`hematite`) et le loader ajoute le préfixe ; les ids vanilla réutilisés ne sont pas préfixés. Le préfixe règle aussi les collisions avec Space Age (`rp-carbon`, `rp-lithium-brine`).
+- [X] **Noms avec `-`**, jamais `_`. `normalize_name` et le générateur normalisent désormais espaces et `_` en `-`. Les noms courts et références des données (`composition`, `associated_with`, alliages) sont normalisés ensemble ; le tableur conserve ses valeurs source.
+- [X] **Préfixe `rp-`** : tous les prototypes créés par le mod (items, fluides, groupes, recettes, technologies, entités, settings) prennent `rp-` ; les fichiers de données gardent les noms courts (`hematite`) et le loader applique le préfixe ; les IDs vanilla réutilisés ne sont pas préfixés. Cela évite aussi les collisions avec Space Age (`rp-carbon`, `rp-lithium-brine`).
 
 - [X] **Scories : un seul type**, comme des cendres. Il ne sert qu'à faire du ciment, du béton ou d'autres matériaux inertes ; ce n'est pas une source d'éléments.
 - [X] **Bâtiments** : à étudier une fois que l'assemblage des prototypes fonctionne (machines autonomes d'abord, voir `machine.md`).
 
-### Restent à décider
+### Décisions confirmées le 25 oct. 2026
 
-- [ ] **Items de base déjà présents dans le jeu** (`iron-ore`, `copper-ore`, `uranium-ore`, `coal`, `stone`, `crude-oil`, `water`). Proposition : ne pas les recréer, les réutiliser (voir `Item.md`, section 8). Il reste à décider ce que donnent `iron-ore` et `copper-ore` au raffinage : 100 % de métal, ou une part de scories.
-- [ ] **Roches disponibles au départ**. Proposition : 8 ressources, le reste par prospection (voir `Item.md`, section 7, et `tech.md`).
-- [ ] **Sens de `level` pour un élément**. Proposition : le niveau du premier procédé qui le libère de sa roche. Cela règle l'étain (cassitérite basic), puis l'aluminium et le silicium dès que la bauxite et les roches siliceuses auront une composition ; thorium et uranium demandent en plus de revoir le niveau de leurs sources.
-- [ ] Procédés de raffinage débloqués par la recherche : à définir avec les recettes et les machines, pas avant.
+- [X] **Items vanilla** : réutiliser les sept prototypes existants, sans les recréer. `iron-ore` et `copper-ore` restent les IDs vanilla des minerais récupérés depuis des roches adaptées ; les constituants secondaires non récupérés deviennent des scories.
+- [X] **Ressources disponibles au départ** : `stone`, `clay`, `limestone`, `sandstone`, `iron-ore`, `copper-ore`, `coal` et `water`. Le fer et le cuivre sont récupérables dès le début ; les autres constituants des roches restent des scories jusqu'à de meilleurs procédés.
+- [X] **Sens de `level` pour un élément** : palier du premier procédé qui le libère. Al et Si passent à `advanced`, Th et U à `experimental`, et Sn à `basic`.
+- [X] **Déblocages de raffinage** : les technologies précises seront définies avec les recettes et les machines ; ce travail est reporté.
 
 ## 1. Utils (`realistic_production_utils`)
 
@@ -67,7 +67,7 @@ Les détails et les chiffres sont dans `RAPPORT.md`.
 - [ ] Ajouter `primary` (composition) et `tech` (resources) dans le tableur et le générateur
 - [ ] Ajouter `vanilla` à la feuille `elements` si des éléments existent déjà dans le jeu
 - [ ] Ajouter `origin` à astatine et francium
-- [ ] Aligner les niveaux une fois le sens de `level` décidé : aluminium et silicium (basic, sources advanced), thorium et uranium (advanced, sources experimental), étain (advanced) contre bronze (basic)
+- [X] Aligner les niveaux selon le premier procédé qui libère l'élément : aluminium et silicium `advanced`, thorium et uranium `experimental`, étain `basic` (cassitérite et bronze `basic`)
 - [ ] Sources des 47 éléments naturels sans source (nickel et phosphore d'abord, puis terres rares, platinoïdes, niobium, tantale…)
 - [ ] Revoir les 23 `associated_with` quand les compositions seront complètes
 - [ ] Ranger `elements_data` hors de `resources/` (ce sont des matériaux) ou le documenter
@@ -143,15 +143,15 @@ Légende : `[x]` fait (vérifié dans les repos au 23 oct.) · `[~]` fait en par
 
 Les détails et les chiffres sont dans `RAPPORT.md`.
 
-## 0. Décisions à prendre (avant d'écrire le code d'ore)
+## 0. Décisions à prendre (copie historique)
 
 - [X] **Convention de noms** : `-` ou `_` ? `normalize_name` (utils) met des `-`, `generate_elements.py` met des `_`, les ids vanilla ont des `-`. Si `-` : changer `norm` dans le générateur et renommer 10 noms (`geothermal_water`, `lithium_brine`, `native_gold`, `native_platinum`, `native_silver`, `native_sulfur`, `natural_gas`, `oil_sand`, `oil_shale`, `stainless_steel`) et leurs références. Attention : `lithium-brine` entrerait probablement en collision avec Space Age.
 - [X] **Préfixe** des ids du mod (`rp-` pour les settings, aucun pour les items ?) et règle pour les ids vanilla gardés (`iron-ore`, `copper-ore`, `uranium-ore`, `coal`, `stone`, `crude-oil`, `water`).
-- [X] **Sens de `level` pour un élément** : niveau du premier procédé qui le libère, ou niveau de sa roche ? Dépend de la mécanique des scories.
-- [X] **Scories** : un seul item `slag` ou une scorie par famille (fer, cuivre…) ? Quelles roches sont disponibles dès le départ ?
+- [X] **Sens de `level` pour un élément** : palier du premier procédé qui le libère ; Al/Si `advanced`, Th/U `experimental`, Sn `basic`.
+- [X] **Scories et départ** : un seul item `slag`, inerte ; huit ressources disponibles au départ (voir décision ci-dessus).
 - [ ] **Bâtiments** : première version en machines autonomes (recommandé), ou bâtiments qui en demandent d'autres pour fonctionner (voir `machine.md`).
-- [ ] **Ressources vanilla** une par une : `coal`, `stone`, `uranium-ore`, `crude-oil`, `water` (naturels, donc a priori gardés) ; `iron-ore` et `copper-ore` sont déjà décidés (minerais génériques).
-- [ ] Procédés de raffinage débloqués par la recherche : à définir avec les recettes et les machines, pas avant.
+- [X] **Ressources vanilla** : réutiliser les sept prototypes existants. Fer et cuivre sont récupérés depuis des roches adaptées ; les constituants secondaires deviennent des scories.
+- [X] Procédés de raffinage débloqués par la recherche : détail reporté à la conception des recettes et des machines.
 
 ## 1. Utils (`realistic_production_utils`)
 
@@ -196,7 +196,7 @@ Les détails et les chiffres sont dans `RAPPORT.md`.
 - [ ] **44 compositions manquantes** : 19 roches, 19 minerais (dont bauxite, pentlandite, latérite, apatite, wolframite, coltan, monazite, bastnasite, lepidolite, carnotite, charbons, tourbe, bitumes), 6 fluides et gaz
 - [ ] Ajouter `primary` (composition) et `tech` (resources) dans le tableur et le générateur
 - [ ] Ajouter `origin` à astatine et francium
-- [ ] Aligner les niveaux : aluminium et silicium (basic, sources advanced), thorium et uranium (advanced, sources experimental), étain (advanced) contre bronze (basic)
+- [X] Aligner les niveaux : aluminium et silicium `advanced`, thorium et uranium `experimental`, étain `basic` (cassitérite et bronze `basic`)
 - [ ] Sources des 47 éléments naturels sans source (nickel et phosphore d'abord, puis terres rares, platinoïdes, niobium, tantale…)
 - [ ] Revoir les 23 `associated_with` quand les compositions seront complètes
 - [ ] Ranger `elements_data` hors de `resources/` (ce sont des matériaux) ou le documenter
