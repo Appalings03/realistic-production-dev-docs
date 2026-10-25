@@ -74,7 +74,7 @@ Les détails et les chiffres sont dans `RAPPORT.md`.
 
 ### Prototypes
 
-- [ ] `data.lua` qui charge les `*_data.lua` et crée items, fluides, groupes, sous-groupes (avec le préfixe `rp-`)
+- [X] `data.lua` charge les `*_data.lua` et crée items, fluides, groupes, sous-groupes (avec le préfixe `rp-`)
 - [ ] Ressources `vanilla = yes` : ne pas créer le prototype, ne modifier en `data-final-fixes` que ce qui change (sous-groupe, ordre, locale)
 - [ ] Supprimer ou remplir `prototypes/dev.lua`
 - [ ] Éléments qui existent déjà dans le jeu (`sulfur` probablement, et `carbon`, `lithium`, `fluorine` avec Space Age) : décider de les réutiliser ou de créer `rp-…` (à vérifier dans `data.raw`). Le préfixe supprime les collisions, `add_proto` n'a plus à ignorer de doublons en silence
@@ -82,11 +82,11 @@ Les détails et les chiffres sont dans `RAPPORT.md`.
 
 ### Settings et locale
 
-- [~] `settings.lua` : trois settings présents, mais ids avec espaces et sans préfixe (`Dev assets`, `Allow pure ore nodes`, `Ore density multiplier`), `per_user` inutile, pas de `order` sur le premier
+- [X] `settings.lua` : trois settings présents, avec ids normalisés (`rp-dev-assets`, `rp-pure-ore-nodes`, `rp-ore-density`), sans `per_user`, et avec un ordre explicite pour chaque option
 
 - [ ] Renommer en `rp-dev-assets`, `rp-pure-ore-nodes`, `rp-ore-density` et ajouter `[mod-setting-name]` / `[mod-setting-description]`
 - [ ] Brancher les settings dans `create_resource` (rien ne les lit)
-- [ ] Générer `locale/en` et `locale/fr` depuis `name_en` / `name_fr` (sections présentes, sans entrées)
+- [X] Générer `locale/en` et `locale/fr` depuis `name_en` / `name_fr` et synchroniser les locales du mod
 - [ ] Retirer les blocs d'exemples commentés de `settings.lua`
 
 ## 3. Assets (`realistic_production_assets`)

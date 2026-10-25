@@ -47,10 +47,10 @@ Dépendances : `assets` et `utils` ne dépendent que de `base` ; `ore` et `build
 
 Jalon : le jeu démarre avec le mod ore ; items et fluides apparaissent dans le menu de craft avec leurs noms FR/EN et des icônes de test.
 
-- [ ] `data.lua` d'ore + loader des `*_data.lua`
+- [X] `data.lua` d'ore charge les données et crée les prototypes d'items et de fluides
 - [ ] Générateurs `create_item`, `create_fluid`, groupes et sous-groupes
 - [ ] Icônes de test teintées par famille (`make_icons`, setting « Dev assets »)
-- [ ] Locale générée depuis `name_en` / `name_fr`
+- [X] Locale générée depuis `name_en` / `name_fr` par `generate_elements.py`
 - [ ] Settings renommés (`rp-…`) avec leur locale
 - [ ] Compositions manquantes (44 ressources sur 88 : bauxite, pentlandite, latérite, apatite, roches…)
 

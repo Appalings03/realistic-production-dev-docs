@@ -31,7 +31,7 @@ Centraliser tout ce qui concerne :
 - [`tech.md`](./RoadMap/tech.md) : notes sur les technologies.
 - [`FactorioMod_techtree.drawio`](./RoadMap/FactorioMod_techtree.drawio) : schéma de l'arbre technologique.
 - [`blender_models_checklist.md`](./RoadMap/blender_models_checklist.md) : checklist des modèles à produire avec Blender.
-- [`generate_elements.py`](./proto_table/generate_elements.py) : script de génération des tables de données.
+- [`generate_elements.py`](./proto_table/generate_elements.py) : génère les tables Lua et les locales `en` / `fr` depuis le tableur.
 - [`elements.xlsx`](./proto_table/elements.xlsx) : tableur source des éléments.
 
 ## Contexte du projet
@@ -63,6 +63,14 @@ Les documents de ce dossier montrent que le projet est encore en phase de fondat
 3. Vérifier les dernières conclusions dans [`RAPPORT.md`](./RAPPORT.md).
 4. Lancer `lua verify.lua` depuis ce dossier pour simuler l'enregistrement des définitions de `ore` et afficher les problèmes par prototype. Le script vérifie la structure et les références des données ; il ne remplace pas un lancement dans Factorio.
 5. Garder ce dossier comme mémoire technique et historique de développement.
+
+Pour régénérer les tables de données et les locales depuis `proto_table/elements.xlsx`, lancer depuis `proto_table/` :
+
+```powershell
+py -3 .\generate_elements.py .\elements.xlsx .
+```
+
+Le script écrit les tables Lua dans ce dossier et les fichiers `locale/en/config.cfg` et `locale/fr/config.cfg`. Après génération, synchroniser ces sorties dans `realistic_production_ore/` avant de tester le mod.
 
 ## Priorités de travail
 

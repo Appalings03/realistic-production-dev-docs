@@ -11,6 +11,7 @@ Une feuille = une table Lua :
     components   -> components_data.lua   (composants fabriqués)
     composition  -> composition_data.lua  (roche -> éléments, en % massique)
 et groups_data.lua (groupes + sous-groupes du menu de craft).
+Les fichiers locale/en/config.cfg et locale/fr/config.cfg sont aussi générés.
 
 Règles :
 - name       : obligatoire, normalisé (minuscules, espaces et "_" -> "-"), unique
@@ -82,6 +83,42 @@ EMIT_ORDER = ["name", "form", "level", "subgroup", "order", "type", "kind",
               "extraction", "vanilla", "origin", "symbol", "atomic", "base",
               "associated_with", "ingredients", "stack_size", "name_en", "name_fr"]
 TEXT_COLS = ("symbol", "name_en", "name_fr")
+LOCALES = {
+    "en": {
+        "name_field": "name_en",
+        "setting_names": {
+            "rp-dev-assets": "Use development icons",
+            "rp-pure-ore-nodes": "Allow pure ore deposits",
+            "rp-ore-density": "Ore density multiplier",
+        },
+        "setting_descriptions": {
+            "rp-dev-assets": "Use placeholder development images instead of final icons.",
+            "rp-pure-ore-nodes": "Allow resource patches containing a single ore.",
+            "rp-ore-density": "Multiplier applied to resource patch density.",
+        },
+    },
+    "fr": {
+        "name_field": "name_fr",
+        "setting_names": {
+            "rp-dev-assets": "Utiliser les icônes de développement",
+            "rp-pure-ore-nodes": "Autoriser les gisements de minerai pur",
+            "rp-ore-density": "Multiplicateur de densité des minerais",
+        },
+        "setting_descriptions": {
+            "rp-dev-assets": "Utilise les images temporaires de développement à la place des icônes finales.",
+            "rp-pure-ore-nodes": "Autorise les gisements contenant un seul type de minerai.",
+            "rp-ore-density": "Multiplicateur appliqué à la densité des gisements.",
+        },
+    },
+}
+LEVEL_NAMES = {
+    "en": {"basic": "Basic", "advanced": "Advanced", "experimental": "Experimental"},
+    "fr": {"basic": "de base", "advanced": "avancé", "experimental": "expérimental"},
+}
+FORM_NAMES = {
+    "en": {"ore": "ores", "material": "materials", "component": "components"},
+    "fr": {"ore": "minerais", "material": "matériaux", "component": "composants"},
+}
 
 
 # --------------------------------------------------------------------------
@@ -374,6 +411,51 @@ def groups_lua() -> str:
     return "\n".join(lines) + "\n"
 
 
+def locale_key(name):
+    return f"rp-{name}"
+
+
+def locale_cfg(tables, locale):
+    config = LOCALES[locale]
+    sections = defaultdict(list)
+    for sheet in ("resources", "elements", "alloys", "materials", "components"):
+        for entry in tables[sheet]:
+            if entry.get("vanilla"):
+                continue
+            category = "fluid-name" if entry["type"] == "fluid" else "item-name"
+            value = entry.get(config["name_field"])
+            if value:
+                sections[category].append((locale_key(entry["name"]), value))
+
+    for group in ("basic", "advanced", "experimental"):
+        group_key = locale_key(f"{group}-processing")
+        level_name = LEVEL_NAMES[locale][group]
+        if locale == "en":
+            group_name = f"{level_name} processing"
+        else:
+            group_name = f"Traitement {level_name}"
+        sections["item-group-name"].append((group_key, group_name))
+
+        for form in FORMS:
+            subgroup_key = locale_key(f"{group}-{form}")
+            form_name = FORM_NAMES[locale][form]
+            if locale == "en":
+                subgroup_name = f"{level_name} {form_name}"
+            else:
+                subgroup_name = f"{form_name.capitalize()} {level_name}"
+            sections["item-subgroup-name"].append((subgroup_key, subgroup_name))
+
+    sections["mod-setting-name"].extend(config["setting_names"].items())
+    sections["mod-setting-description"].extend(config["setting_descriptions"].items())
+
+    lines = []
+    for section, entries in sections.items():
+        lines.append(f"[{section}]")
+        lines.extend(f"{key}={value}" for key, value in entries)
+        lines.append("")
+    return "\n".join(lines)
+
+
 def main():
     source = Path(sys.argv[1] if len(sys.argv) > 1 else "elements.xlsx")
     out_dir = Path(sys.argv[2] if len(sys.argv) > 2 else ".")
@@ -396,6 +478,11 @@ def main():
         print(f"{len(tables[sheet]):4d} lignes -> {cfg['file']}")
     (out_dir / "groups_data.lua").write_text(groups_lua(), encoding="utf-8")
     print("   3 groupes, 9 sous-groupes -> groups_data.lua")
+    for locale in LOCALES:
+        locale_path = out_dir / "locale" / locale / "config.cfg"
+        locale_path.parent.mkdir(parents=True, exist_ok=True)
+        locale_path.write_text(locale_cfg(tables, locale), encoding="utf-8")
+        print(f"locale générée -> {locale_path.relative_to(out_dir)}")
 
     for message in warnings:
         print("Attention :", message)
