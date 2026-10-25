@@ -1,4 +1,3 @@
-
 # Machines et procédés
 
 > Proposition de conception pour Factorio 2.1. Les machines ci-dessous forment une progression possible ; leurs dimensions, coûts, vitesses, catégories et recettes restent à concevoir et équilibrer.
@@ -76,6 +75,8 @@ Pour une première version, chaque étape peut être une entité Factorio distin
 N’introduire une mécanique de multibloc que si elle est réalisable et lisible avec les contraintes de Factorio. La version initiale peut représenter chaque poste par une machine autonome reliée par des tapis et des tuyaux.
 
 ## Dépendances entre bâtiments
+
+> Décision du 23 oct. 2026 : reporté. Ce sujet sera repris quand l'assemblage des prototypes fonctionne ; la première version utilise des machines autonomes (option A).
 
 Idée : certains bâtiments ne fonctionnent que si d'autres bâtiments sont présents (une raffinerie qui demande une colonne de distillation, un réacteur catalytique et un séparateur pétrole/eau salée). Trois façons de l'implémenter, de la plus simple à la plus coûteuse :
 

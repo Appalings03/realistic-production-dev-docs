@@ -1,4 +1,3 @@
-
 # Items et chaînes de production
 
 > Document de conception pour Realistic Production, ciblant Factorio 2.1. Les propositions ci-dessous ne modifient pas le code. Les noms déjà présents dans `proto_table` sont des données de départ ; les recettes et rendements restent à équilibrer.
@@ -154,7 +153,7 @@ Le joueur ne reçoit pas tout d'une roche dès le départ. La progression se fai
 
 1. **Début de partie** : seules certaines roches sont extractibles. Les autres sont verrouillées par une technologie (colonne `tech` de la feuille `resources` ; vide = disponible dès le départ).
 2. **Raffinage basique** : le traitement d'une roche ne donne que son élément principal. Tout le reste devient des **scories**.
-3. **Retraitement** : des technologies permettent de retraiter les scories (béton, ciment) et d'extraire les autres éléments de la roche brute.
+3. **Procédés avancés** : des technologies permettent de valoriser les scories (ciment, béton) et d'extraire, à partir de la roche brute, les autres éléments qui partaient en scories.
 
 C'est proche de la métallurgie réelle, où les scories de haut fourneau sont valorisées en ciment.
 
@@ -173,23 +172,55 @@ Il faut donc une colonne **`primary`** (yes/no) dans la feuille `composition`, r
 
 ### Scories
 
-- À décider : un seul item `slag`, ou une scorie par famille (fer, cuivre, aluminium…). Une scorie par famille permet de récupérer des éléments différents au retraitement.
-- Usage de départ : béton et matériaux de construction (voir « Remplacement des objets vanilla », pierre).
-- Les éléments secondaires récupérés au retraitement sont ceux de la colonne `composition` qui ne sont pas `primary`.
-- Les scories sont des items solides : elles occupent de la place et se stockent, ce qui donne une raison logistique à les valoriser.
+Décidé le 23 oct. 2026 : **un seul type de scorie**, comme des cendres.
+
+- Elle ne sert qu'à faire du ciment, du béton ou d'autres matériaux inertes. Ce n'est pas une source d'éléments : les éléments secondaires s'obtiennent en retraitant la **roche brute** avec un procédé avancé, à la place des scories.
+- La quantité de scories par recette reste à équilibrer (par exemple selon la part des éléments non `primary` dans `composition`).
+- Usage de départ : ciment et béton (voir « Remplacement des objets vanilla », pierre).
+- Les scories s'accumulent : une recette qui les consomme (ciment, béton) doit être accessible tôt.
 
 ### Conséquences sur les données
 
 - Feuille `resources` : colonne `tech` (technologie qui déverrouille la roche).
 - Feuille `composition` : colonne `primary`.
 - `level` d'un élément : à redéfinir comme le niveau du premier procédé qui le libère. Aujourd'hui, aluminium et silicium sont `basic` alors que toutes leurs sources sont `advanced`, et thorium et uranium sont `advanced` pour des sources `experimental`.
-- Les recettes de raffinage basique peuvent être **générées** depuis `composition` et `primary` ; seules les recettes de retraitement demandent un travail à la main.
+- Les recettes de raffinage basique peuvent être **générées** depuis `composition` et `primary` ; seules les recettes des procédés avancés demandent un travail à la main.
 - Règle de non-blocage : les roches disponibles au départ doivent suffire à fabriquer les premiers packs de science (voir `tech.md`).
+
+### Ressources disponibles au départ (proposition)
+
+Les 88 ressources sont réparties en cinq paliers de déblocage. La colonne `tech` de `resources` porte la technologie du palier ; elle reste vide pour le palier de départ. Les paliers suivent le `level` actuel du tableur (54 basic, 30 advanced, 4 experimental).
+
+| Palier | Ressources | Nombre |
+| --- | --- | --- |
+| Départ (aucune recherche) | `stone`, `clay`, `limestone`, `sandstone`, `iron-ore`, `copper-ore`, `coal`, `water` | 8 |
+| Prospection de base | granite, basalt, marbre, quartzite, hématite, magnétite, malachite, cassitérite, galène, sphalérite, halite, gypse, soufre natif, tourbe, lignite | 15 |
+| Prospection géologique | les 31 autres ressources `basic` : gabbro, diorite, rhyolite, andésite, dolomie, schiste, craie, gneiss, ardoise, goethite, sidérite, bauxite, chalcopyrite, bornite, chalcocite, chromite, pyrolusite, ilménite, rutile, sylvite, carnallite, anhydrite, trona, nitratine, pyrite, apatite, graphite, anthracite, pétrole brut, eau de mer, air | 31 |
+| Prospection avancée | les 30 ressources `advanced` | 30 |
+| Matières nucléaires | les 4 ressources `experimental` (uraninite, carnotite, thorianite, `uranium-ore`) | 4 |
+
+Pourquoi ce départ :
+
+- Il reproduit l'ouverture de Factorio (fer, cuivre, charbon, pierre, eau), donc les premiers packs de science restent fabricables sans recherche.
+- Argile, calcaire et grès donnent les briques, les fours et le ciment, qui sert aussi à consommer les scories dès le début.
+- Le palier « de base » apporte les métaux nécessaires aux premiers alliages (bronze, laiton), le sel et le gypse. Il suppose que l'étain passe `basic` (voir « Sens de `level` »).
+- Le pétrole brut arrive avec les technologies de pétrole du jeu de base, comme dans la version vanilla ; l'air est extrait par une machine.
+
+## 8. Items déjà présents dans le jeu
+
+Question posée le 23 oct. : faut-il créer des prototypes qui existent déjà ? **Non, il vaut mieux les réutiliser.**
+
+- Sept ressources sont marquées `vanilla = yes` : `stone`, `iron-ore`, `copper-ore`, `uranium-ore`, `coal`, `crude-oil`, `water`. Le loader ne crée pas leur item ou leur fluide. Les recettes, technologies et mods qui les utilisent continuent de fonctionner, et il n'y a ni doublon ni icône à refaire.
+- Ce qui change pour elles se règle dans `data-final-fixes` (sous-groupe, ordre, gisements, recettes de raffinage), sans recréer le prototype.
+- Tout ce qui n'existe pas dans le jeu est créé avec le préfixe `rp-` (décision du 23 oct., à valider : voir `TODO.md`).
+- Certains éléments ont déjà un équivalent : `sulfur` probablement, `carbon`, `lithium` et `fluorine` avec Space Age (à vérifier dans `data.raw`). Proposition : réutiliser ceux du jeu de base, créer des `rp-` pour les autres, et trancher pour Space Age avec l'extension. Cela demande une colonne `vanilla` dans la feuille `elements`.
+- `iron-ore` et `copper-ore` sont des minerais génériques sans composition : à décider s'ils donnent 100 % de métal ou une part de scories.
 
 ## Points restant à décider
 
-- Quelles roches sont disponibles au départ, et lesquelles sont verrouillées.
-- Une scorie unique ou une scorie par famille.
+- Valider les paliers de déblocage des ressources (section 7).
+- Quantité de scories par recette de raffinage basique.
+- Ce que donnent `iron-ore` et `copper-ore` au raffinage (section 8).
 - Quantités et rendements de chaque étape, y compris la fréquence des sous-produits.
 - Quels minerais doivent être nécessaires à la progression principale et lesquels sont facultatifs.
 - Quels éléments sont fluides, poudres ou lingots dans l’interface du jeu.

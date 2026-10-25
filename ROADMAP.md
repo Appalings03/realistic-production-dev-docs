@@ -1,17 +1,19 @@
+
 # Roadmap — Realistic Production
 
-Mise à jour : 23 oct. 2026 · Cible : Factorio 2.1 · Extension Space Age prévue plus tard
+Mise à jour : 24 oct. 2026 · Cible : Factorio 2.1 · Extension Space Age prévue plus tard
 
 Objectif : des chaînes de production plus réalistes — roche brute → minerais → lingots → pièces → produits finis, avec fluides, broyage, multiblocs et nouveaux packs de science.
 
 ## Principes de conception
 
 - **Le monde ne contient que ce qui existe naturellement sur Terre** : roches, minerais, fluides et gaz. Les éléments artificiels sont fabriqués par le joueur et servent à la recherche.
-- **Extraction progressive** : au début, certaines roches ne sont pas extractibles. Le raffinage basique d'une roche ne garde que son élément principal et le reste devient des scories. Des technologies permettent ensuite de retraiter les scories (béton) et d'extraire les autres éléments. Détails dans `RoadMap/Item.md`.
+- **Extraction progressive** : au début, certaines roches ne sont pas extractibles. Le raffinage basique d'une roche ne garde que son élément principal et le reste devient des scories. Il n'existe qu'**un seul type de scorie**, inerte, comme des cendres : elle ne sert qu'à faire du ciment, du béton ou d'autres matériaux inertes. Les autres éléments s'obtiennent avec des procédés avancés appliqués à la roche brute. Détails dans `RoadMap/Item.md`.
 - **Gisements mixtes** : un patch peut contenir plusieurs minerais ou roches souvent associés dans la réalité (`associated_with`).
-- **Bâtiments débloqués par la recherche** : chaque machine est liée à une technologie. Certains bâtiments demanderont d'autres bâtiments pour fonctionner ; la première version reste simple (voir `RoadMap/machine.md`).
+- **Bâtiments débloqués par la recherche** : chaque machine est liée à une technologie. Certains bâtiments demanderont d'autres bâtiments pour fonctionner ; ce sujet est reporté jusqu'à ce que l'assemblage des prototypes fonctionne (voir `RoadMap/machine.md`).
+- **Noms** : tirets (`-`), jamais de `_`. Tout prototype créé par le mod porte le préfixe `rp-` (à valider) ; les ids du jeu de base réutilisés ne sont pas préfixés.
 - **Alliages simplifiés** : acier, bronze, laiton, duralumin, acier inoxydable.
-- **Ressources vanilla** : `iron-ore` et `copper-ore` restent comme minerais génériques ; le sort des autres dépend de leur existence naturelle.
+- **Ressources vanilla** : `iron-ore` et `copper-ore` restent comme minerais génériques ; les sept ressources déjà présentes dans le jeu sont réutilisées, pas recréées (voir `RoadMap/Item.md`, section 8).
 - **Space Age** : hors périmètre tant que les phases 1 à 5 ne sont pas stables.
 
 ## Architecture (5 repos + dev-docs)
@@ -34,9 +36,12 @@ Dépendances : `assets` et `utils` ne dépendent que de `base` ; `ore` et `build
 - [X] Modèle de données : 88 ressources, 118 éléments, 5 alliages, groupes et sous-groupes, 115 lignes de composition (script Python)
 - [X] Niveaux (`level`) et quantités d'alliages remplis
 - [X] Nettoyage : faute `buidling`, versions 2.1, `bool = {}` retiré des settings de building
-- [X] **Convention de noms** : `-` ou `_`, préfixes, collisions Space Age (utils et générateur ne sont pas d'accord)
-- [ ] **Définition du `level`** d'un élément et alignement des 5 cas incohérents
-- [ ] Données de la mécanique des scories : colonnes `primary` (composition) et `tech` (resources)
+- [X] **Convention de noms décidée** (23 oct.) : tirets et préfixe `rp-`
+- [ ] Appliquer la convention : `norm` du générateur (une ligne), régénérer, renommer les settings
+- [X] **Scorie unique** décidée (23 oct.)
+- [ ] **Définition du `level`** d'un élément et alignement des 5 cas incohérents (à décider)
+- [ ] Roches disponibles au départ (proposition dans `Item.md`, section 7)
+- [ ] Colonnes `primary` (composition), `tech` (resources) et `vanilla` (elements) dans le tableur et le générateur
 
 ## Phase 1 — Ore jouable *(prochaine étape)*
 
@@ -58,7 +63,8 @@ Jalon : on peut miner des roches et des minerais et obtenir les éléments de ba
 - [ ] Raffinage basique : élément principal + scories (`create_recipe`, `ing` / `res`)
 - [ ] Gaz de l'air (machine) et fluides (gisements)
 - [ ] Alliages simplifiés (acier, bronze, laiton, acier inox, duralumin)
-- [ ] Technologies de retraitement : scories → béton, extraction des éléments secondaires
+- [ ] Recettes de ciment et de béton à partir des scories
+- [ ] Procédés avancés : extraction des éléments secondaires depuis la roche brute
 - [ ] Technologies de déblocage par niveau : Basic → Advanced → Experimental
 
 ## Phase 3 — Bâtiments
@@ -67,7 +73,7 @@ Jalon : chaque étape de la chaîne de démarrage (extraction, concassage, prép
 
 - [ ] `create_building`, `create_machine`, catégories de craft, `fluid_boxes`
 - [ ] Première version : machines autonomes reliées par tapis et tuyaux
-- [ ] Dépendances entre bâtiments (décision à prendre, voir `machine.md`)
+- [ ] Dépendances entre bâtiments : reportées, à reprendre quand l'assemblage des prototypes fonctionne (voir `machine.md`)
 - [ ] Multiblocs (ex. raffinerie : tour de distillation, tour catalytique, séparateur pétrole/eau salée)
 - [ ] Sprites et animations (assets) ; modèles 3D suivis dans `blender_models_checklist.md`
 
@@ -90,9 +96,9 @@ Jalon : chaque étape de la chaîne de démarrage (extraction, concassage, prép
 
 ## Ordre de travail conseillé
 
-1. Phase 0 : trancher la convention de noms, la définition des niveaux et les colonnes `primary` / `tech` (quelques heures).
+1. Phase 0 : appliquer la convention de noms, trancher la définition des niveaux et les roches de départ, ajouter les colonnes `primary` / `tech` / `vanilla` (quelques heures).
 2. Phase 1 : loader, générateurs, icônes de test, locale.
-3. Phase 2 : ressources, puis raffinage basique, puis retraitement des scories.
+3. Phase 2 : ressources, puis raffinage basique, puis ciment/béton et procédés avancés.
 4. Phases 3 et 4 en parallèle.
 5. Phase 5.
 
