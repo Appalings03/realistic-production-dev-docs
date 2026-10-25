@@ -154,7 +154,7 @@ Ces technologies portent la progression d'extraction décrite dans `Item.md` (se
 
 Règles :
 
-- Décision du 25 oct. 2026 : les huit ressources de départ sont `stone`, `clay`, `limestone`, `sandstone`, `iron-ore`, `copper-ore`, `coal` et `water`. Le fer et le cuivre sont récupérés depuis des roches adaptées ; au début, les constituants secondaires deviennent des scories. Aucune ressource de départ ne doit demander une recherche fabriquée avec ses propres produits.
+- Décision du 25 oct. 2026 : les huit ressources de départ sont `stone`, `clay`, `limestone`, `sandstone`, hématite, malachite, `coal` et `water`. Le fer et le cuivre (`iron-ore`, `copper-ore`) sont les produits du raffinage de l'hématite et de la malachite ; au début, les constituants solides secondaires deviennent des scories et les constituants volatils disparaissent. Aucune ressource de départ ne doit demander une recherche fabriquée avec ses propres produits.
 - Une roche verrouillée a une seule technologie (colonne `tech`) ; cette technologie ne demande que des packs fabricables avec les roches déjà disponibles.
 - La scorie est unique et inerte. Elle ne bloque jamais une machine pleine : prévoir un moyen de la stocker ou de la consommer (ciment, béton) à coût raisonnable, dès le début.
 

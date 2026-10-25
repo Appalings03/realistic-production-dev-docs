@@ -1,8 +1,9 @@
+
 # TODO — Realistic Production
 
 Mis à jour le 25 oct. 2026 · @Martin
 
-Légende : `[X]` fait (vérifié dans les repos au 24 oct.) · `[~]` fait en partie · `[ ]` à faire
+Légende : `[X]` fait (vérifié dans les repos au 25 oct.) · `[~]` fait en partie · `[ ]` à faire
 
 Les détails et les chiffres sont dans `RAPPORT.md`.
 
@@ -12,14 +13,14 @@ Les détails et les chiffres sont dans `RAPPORT.md`.
 
 - [X] **Noms avec `-`**, jamais `_`. `normalize_name` et le générateur normalisent désormais espaces et `_` en `-`. Les noms courts et références des données (`composition`, `associated_with`, alliages) sont normalisés ensemble ; le tableur conserve ses valeurs source.
 - [X] **Préfixe `rp-`** : tous les prototypes créés par le mod (items, fluides, groupes, recettes, technologies, entités, settings) prennent `rp-` ; les fichiers de données gardent les noms courts (`hematite`) et le loader applique le préfixe ; les IDs vanilla réutilisés ne sont pas préfixés. Cela évite aussi les collisions avec Space Age (`rp-carbon`, `rp-lithium-brine`).
-
 - [X] **Scories : un seul type**, comme des cendres. Il ne sert qu'à faire du ciment, du béton ou d'autres matériaux inertes ; ce n'est pas une source d'éléments.
 - [X] **Bâtiments** : à étudier une fois que l'assemblage des prototypes fonctionne (machines autonomes d'abord, voir `machine.md`).
 
 ### Décisions confirmées le 25 oct. 2026
 
-- [X] **Items vanilla** : réutiliser les sept prototypes existants, sans les recréer. `iron-ore` et `copper-ore` restent les IDs vanilla des minerais récupérés depuis des roches adaptées ; les constituants secondaires non récupérés deviennent des scories.
-- [X] **Ressources disponibles au départ** : `stone`, `clay`, `limestone`, `sandstone`, `iron-ore`, `copper-ore`, `coal` et `water`. Le fer et le cuivre sont récupérables dès le début ; les autres constituants des roches restent des scories jusqu'à de meilleurs procédés.
+- [X] **Items vanilla** : réutiliser les sept prototypes existants, sans les recréer. `iron-ore` et `copper-ore` restent les IDs vanilla, obtenus comme **produits** du raffinage de l'hématite et de la malachite (pas de gisement posé dans le monde).
+- [X] **Ressources disponibles au départ** : `stone`, `clay`, `limestone`, `sandstone`, **hématite**, **malachite**, `coal` et `water` (décision du 25 oct. : roches de départ pour le fer et le cuivre). Magnétite, goethite et sidérite arrivent avec la prospection de base ; les sulfures de cuivre avec la prospection géologique.
+- [X] **Éléments volatils** (O, H, C, S) : ils disparaissent au raffinage basique ; seuls les éléments solides non principaux deviennent des scories. Les gaz de procédé (CO₂, SO₂) viendront plus tard.
 - [X] **Sens de `level` pour un élément** : palier du premier procédé qui le libère. Al et Si passent à `advanced`, Th et U à `experimental`, et Sn à `basic`.
 - [X] **Déblocages de raffinage** : les technologies précises seront définies avec les recettes et les machines ; ce travail est reporté.
 
@@ -40,12 +41,17 @@ Les détails et les chiffres sont dans `RAPPORT.md`.
 ### Ore — `utils/ore.lua`
 
 - [X] `load_data(path)` : chargement et validation du retour des fichiers `*_data.lua`
-- [X] `create_item{...}` et `create_fluid{...}` (un fluide demande `base_color` et `flow_color`)
+- [X] `create_item{...}` (préfixe `rp-`, icônes de test, vanilla ignoré)
+
+- [~] `create_fluid{...}` : `base_color` et `flow_color` exigés, mais **`default_temperature` (obligatoire) manque** : tant qu'il n'est pas ajouté, le mod ne charge pas dans Factorio
+
 - [X] `create_group` et `create_subgroup` (données dans `groups_data.lua`)
 - [X] `make_icons(name, tint)` : s'appuie sur `icons(name, opts)` de `general.lua`
 - [X] `ing(name, amount, type)` et `res(...)` : `type` explicite pour Factorio 2.x
+
 - [~] `create_resource{...}` : création avec `minable.results`, `stages`, `map_color` et `autoplace` fournis par l'appelant ; densité, nodes purs et gisements mixtes à préciser avec les settings et données
-- [X] `create_recipe{...}` : recette 2.x avec ingrédients/résultats typés et IDs préfixés
+- [~] `create_recipe{...}` : **échoue toujours** (le champ `ingredients` est dans `INTERNAL_FIELDS`, donc supprimé avant la lecture) ; l'exemple du README d'utils échoue aussi. Après correction, retester avec cet exemple
+
 - [ ] Raffinage basique généré depuis `composition` : ajouter d'abord `primary` et définir le rendement / la destination des produits
 - [X] `create_technology{...}` : prérequis, recettes débloquées et coût en science via `unit`
 
@@ -64,7 +70,9 @@ Les détails et les chiffres sont dans `RAPPORT.md`.
 - [X] `level` rempli partout ; `generate_elements.py` et `elements.xlsx` versionnés dans dev-docs
 - [ ] `materials_data` et `components_data` : tables vides (lingots, plaques, poudres, pièces)
 - [ ] **44 compositions manquantes** : 19 roches, 19 minerais (dont bauxite, pentlandite, latérite, apatite, wolframite, coltan, monazite, bastnasite, lepidolite, carnotite, charbons, tourbe, bitumes), 6 fluides et gaz
-- [ ] Ajouter `primary` (composition) et `tech` (resources) dans le tableur et le générateur
+- [ ] Ajouter `primary` (composition) et `tech` (resources) dans le tableur et le générateur ; ajouter aussi une colonne indiquant les éléments volatils (ou une liste dans le générateur) pour calculer les scories
+- [ ] Compositions de départ à compléter d'abord : `stone`, `clay`, `limestone`, `sandstone`, `coal`, `water` (les 8 de départ n'en ont pas, sauf hématite et malachite)
+- [ ] Passer `iron-ore` et `copper-ore` en « produit » (pas de gisement) dans les données, et réattribuer goethite et sidérite au palier de base
 - [ ] Ajouter `vanilla` à la feuille `elements` si des éléments existent déjà dans le jeu
 - [ ] Ajouter `origin` à astatine et francium
 - [X] Aligner les niveaux selon le premier procédé qui libère l'élément : aluminium et silicium `advanced`, thorium et uranium `experimental`, étain `basic` (cassitérite et bronze `basic`)
@@ -74,27 +82,30 @@ Les détails et les chiffres sont dans `RAPPORT.md`.
 
 ### Prototypes
 
-- [X] `data.lua` charge les `*_data.lua` et crée items, fluides, groupes, sous-groupes (avec le préfixe `rp-`)
-- [ ] Ressources `vanilla = yes` : ne pas créer le prototype, ne modifier en `data-final-fixes` que ce qui change (sous-groupe, ordre, locale)
+- [X] `data.lua` charge les `*_data.lua` et crée items, fluides, groupes, sous-groupes (avec le préfixe `rp-`) : 204 prototypes + 12 groupes et sous-groupes dans une simulation de l'étape data (pas encore dans Factorio)
+
+- [~] Ressources `vanilla = yes` : le prototype n'est pas créé (fait) ; reste à modifier en `data-final-fixes` ce qui change (sous-groupe, ordre, locale)
+
 - [ ] Supprimer ou remplir `prototypes/dev.lua`
 - [ ] Éléments qui existent déjà dans le jeu (`sulfur` probablement, et `carbon`, `lithium`, `fluorine` avec Space Age) : décider de les réutiliser ou de créer `rp-…` (à vérifier dans `data.raw`). Le préfixe supprime les collisions, `add_proto` n'a plus à ignorer de doublons en silence
-- [ ] Fluides : couleurs (`base_color`, `flow_color`) tirées de la teinte
+- [X] Fluides : couleurs (`base_color`, `flow_color`) définies dans `data.lua` pour les 18 fluides
+- [ ] Teintes des icônes : aucune colonne `tint` ni conversion de `kind`, donc les 204 icônes de test sont identiques
+- [ ] Confirmer le niveau du plomb (`advanced`, alors que la galène est `basic`)
 
 ### Settings et locale
 
 - [X] `settings.lua` : trois settings présents, avec ids normalisés (`rp-dev-assets`, `rp-pure-ore-nodes`, `rp-ore-density`), sans `per_user`, et avec un ordre explicite pour chaque option
-
-- [ ] Renommer en `rp-dev-assets`, `rp-pure-ore-nodes`, `rp-ore-density` et ajouter `[mod-setting-name]` / `[mod-setting-description]`
-- [ ] Brancher les settings dans `create_resource` (rien ne les lit)
+- [X] Locale des settings : `[mod-setting-name]` et `[mod-setting-description]` présents en EN et FR (générés)
+- [ ] Brancher `rp-pure-ore-nodes` et `rp-ore-density` dans `create_resource` (seul `rp-dev-assets` est lu aujourd'hui)
 - [X] Générer `locale/en` et `locale/fr` depuis `name_en` / `name_fr` et synchroniser les locales du mod
-- [ ] Retirer les blocs d'exemples commentés de `settings.lua`
+- [X] Blocs d'exemples commentés retirés de `settings.lua`
 
 ## 3. Assets (`realistic_production_assets`)
 
 - [X] Images de test : 4 icônes 64×64 et 4 images 256×256 dans `graphics/dev/`
 - [X] `thumbnail.png` est un vrai PNG (720×380)
-- [ ] Réécrire `graphics/README.md` (obsolète : 32×32, `prototypes/util.lua`, `realistic-iron-ore/`)
-- [ ] Choisir **une** arborescence et aligner `icon_path`
+- [X] `graphics/README.md` réécrit (25 oct.) : `graphics/items/<id-prototype>.png`, mode dev
+- [X] Une seule arborescence, alignée sur `icon_path`
 - [ ] Icônes de base par forme : roche, minerai, lingot, fluide, gaz (64×64, à teinter)
 - [ ] Miniature à la taille du mod portal
 - [ ] Sons et sprites quand nécessaire (voir `blender_models_checklist.md`)
@@ -124,7 +135,9 @@ Les détails et les chiffres sont dans `RAPPORT.md`.
 - [X] Archiver les fichiers `OLD` de `RoadMap/` (`Liste feature_OLD.xlsx`, `Roadmap — Realistic Production — OLD.md`)
 - [ ] Décider des stubs vides (`control.lua`, `data-updates.lua`, `data-final-fixes.lua`, `settings-*.lua`) : supprimer ou garder pour la suite
 - [ ] Changelogs : les 5 sont identiques (texte générique, 0.0.1 du 22 oct.)
-- [ ] Exécuter `verify.lua` et faire un **premier lancement dans Factorio** avec les cinq mods
+- [ ] Ajouter un `.gitignore` (un `__pycache__/*.pyc` est versionné dans dev-docs)
+- [ ] `verify.lua` : chemins Windows (`\\`) et ne contrôle que les données ; l'adapter ou le remplacer
+- [ ] **Premier lancement dans Factorio** : d'abord assets + utils + ore (après correction des 2 bugs), puis les cinq mods
 
 ## 7. Idées en attente
 

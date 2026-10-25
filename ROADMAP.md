@@ -1,7 +1,6 @@
-
 # Roadmap — Realistic Production
 
-Mise à jour : 24 oct. 2026 · Cible : Factorio 2.1 · Extension Space Age prévue plus tard
+Mise à jour : 25 oct. 2026 · Cible : Factorio 2.1 · Extension Space Age prévue plus tard
 
 Objectif : des chaînes de production plus réalistes — roche brute → minerais → lingots → pièces → produits finis, avec fluides, broyage, multiblocs et nouveaux packs de science.
 
@@ -13,16 +12,16 @@ Objectif : des chaînes de production plus réalistes — roche brute → minera
 - **Bâtiments débloqués par la recherche** : chaque machine est liée à une technologie. Certains bâtiments demanderont d'autres bâtiments pour fonctionner ; ce sujet est reporté jusqu'à ce que l'assemblage des prototypes fonctionne (voir `RoadMap/machine.md`).
 - **Noms** : tirets (`-`), jamais de `_`. Les noms des prototypes créés par le mod portent le préfixe `rp-` ; les IDs vanilla réutilisés ne sont pas préfixés. Les tables de données conservent les noms courts et le loader applique le préfixe.
 - **Alliages simplifiés** : acier, bronze, laiton, duralumin, acier inoxydable.
-- **Ressources vanilla** : `iron-ore` et `copper-ore` restent comme minerais génériques ; les sept ressources déjà présentes dans le jeu sont réutilisées, pas recréées (voir `RoadMap/Item.md`, section 8).
+- **Ressources vanilla** : `iron-ore` et `copper-ore` restent les IDs du jeu de base, comme produits du raffinage de l'hématite et de la malachite ; les sept ressources déjà présentes dans le jeu sont réutilisées, pas recréées (voir `RoadMap/Item.md`, section 8).
 - **Space Age** : hors périmètre tant que les phases 1 à 5 ne sont pas stables.
 
 ## Architecture (5 repos + dev-docs)
 
 | Repo     | Mod                               | Rôle                                                         | Avancement                                              |
 | -------- | --------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------- |
-| assets   | `realistic_production_assets`   | graphismes, sons                                              | ◐ images de test (`graphics/dev/`), README obsolète |
-| utils    | `realistic_production_utils`    | fonctions communes                                            | ◐ `general.lua` fait (6 fonctions), 4 modules vides  |
-| ore      | `realistic_production_ore`      | roches, minerais, fluides, éléments, alliages               | ◐ données générées, `data.lua` vide              |
+| assets   | `realistic_production_assets`   | graphismes, sons                                              | ◐ images de test (`graphics/dev/`), README à jour, pas d'icône définitive |
+| utils    | `realistic_production_utils`    | fonctions communes                                            | ◐ `general.lua` (6 fonctions) et `ore.lua` (11 fonctions, 2 bugs), 3 modules vides |
+| ore      | `realistic_production_ore`      | roches, minerais, fluides, éléments, alliages               | ◐ `data.lua` crée items, fluides et groupes (non testé dans Factorio) |
 | building | `realistic_production_building` | machines, multiblocs                                          | ▫ vide                                                 |
 | core     | `realistic_production_main`     | charge les autres, adapte le vanilla                          | ▫ vide                                                 |
 | dev-docs | (documentation)                   | roadmap, TODO, rapport, notes de conception, `proto_table/` | ✓                                                      |
@@ -40,25 +39,29 @@ Dépendances : `assets` et `utils` ne dépendent que de `base` ; `ore` et `build
 - [X] Normaliser les noms du générateur en tirets et régénérer les tables ; convention `rp-` décidée pour les prototypes non-vanilla (le renommage des settings reste à faire avec leur locale)
 - [X] **Scorie unique** décidée (23 oct.)
 - [X] **Définition du `level`** d'un élément : palier du premier procédé qui le libère ; Al/Si `advanced`, Th/U `experimental`, Sn `basic`
-- [X] Ressources disponibles au départ : les 8 ressources de `Item.md`, section 7 ; fer et cuivre proviennent de roches adaptées
+- [X] Ressources disponibles au départ : les 8 ressources de `Item.md`, section 7 ; fer et cuivre viennent de l'hématite et de la malachite (`iron-ore` / `copper-ore` sont des produits, décision du 25 oct.)
 - [ ] Colonnes `primary` (composition), `tech` (resources) et `vanilla` (elements) dans le tableur et le générateur
+- [ ] Confirmer le niveau du plomb (`advanced`, alors que la galène est `basic`)
 
-## Phase 1 — Ore jouable *(prochaine étape)*
+## Phase 1 — Ore jouable *(en cours : 2 bugs à corriger avant le premier lancement)*
 
 Jalon : le jeu démarre avec le mod ore ; items et fluides apparaissent dans le menu de craft avec leurs noms FR/EN et des icônes de test.
 
 - [X] `data.lua` d'ore charge les données et crée les prototypes d'items et de fluides
-- [ ] Générateurs `create_item`, `create_fluid`, groupes et sous-groupes
-- [ ] Icônes de test teintées par famille (`make_icons`, setting « Dev assets »)
+- [X] Générateurs `create_item`, `create_fluid`, groupes et sous-groupes (`utils/ore.lua`)
+- [ ] **Bug** : ajouter `default_temperature` aux fluides (propriété obligatoire, sinon le mod ne charge pas)
+- [ ] **Bug** : `create_recipe` échoue (le champ `ingredients` est filtré) ; corriger avant la phase 2
+- [ ] Icônes de test teintées par famille : aujourd'hui les 204 icônes sont identiques (pas de colonne `tint`)
 - [X] Locale générée depuis `name_en` / `name_fr` par `generate_elements.py`
-- [ ] Settings renommés (`rp-…`) avec leur locale
+- [X] Settings renommés (`rp-…`) avec leur locale
+- [ ] **Premier lancement dans Factorio** avec assets + utils + ore (jalon de la phase)
 - [ ] Compositions manquantes (44 ressources sur 88 : bauxite, pentlandite, latérite, apatite, roches…)
 
 ## Phase 2 — Ressources et raffinage
 
 Jalon : on peut miner des roches et des minerais et obtenir les éléments de base.
 
-- [ ] `create_resource` (autoplace, densité, nodes purs, gisements mixtes via `associated_with`)
+- [~] `create_resource` : le helper existe, mais aucune ressource n'est encore posée ; autoplace, densité, nodes purs et gisements mixtes via `associated_with` restent à faire
 - [ ] Roches verrouillées au départ (technologie de prospection par roche)
 - [ ] Raffinage basique : élément principal + scories (`create_recipe`, `ing` / `res`)
 - [ ] Gaz de l'air (machine) et fluides (gisements)
@@ -96,8 +99,8 @@ Jalon : chaque étape de la chaîne de démarrage (extraction, concassage, prép
 
 ## Ordre de travail conseillé
 
-1. Phase 0 : appliquer la convention de noms, trancher la définition des niveaux et les roches de départ, ajouter les colonnes `primary` / `tech` / `vanilla` (quelques heures).
-2. Phase 1 : loader, générateurs, icônes de test, locale.
+1. Phase 0 : ajouter les colonnes `primary` / `tech` / `vanilla` (quelques heures).
+2. Phase 1 : corriger les 2 bugs (fluides, `create_recipe`), teintes d'icônes, puis premier lancement dans Factorio.
 3. Phase 2 : ressources, puis raffinage basique, puis ciment/béton et procédés avancés.
 4. Phases 3 et 4 en parallèle.
 5. Phase 5.

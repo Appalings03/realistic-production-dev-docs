@@ -175,7 +175,7 @@ Il faut donc une colonne **`primary`** (yes/no) dans la feuille `composition`, r
 Décidé le 23 oct. 2026 : **un seul type de scorie**, comme des cendres.
 
 - Elle ne sert qu'à faire du ciment, du béton ou d'autres matériaux inertes. Ce n'est pas une source d'éléments : les éléments secondaires s'obtiennent en retraitant la **roche brute** avec un procédé avancé, à la place des scories.
-- La quantité de scories par recette reste à équilibrer (par exemple selon la part des éléments non `primary` dans `composition`).
+- La quantité de scories par recette reste à équilibrer (par exemple selon la part des éléments solides non `primary` dans `composition` ; les éléments volatils n'en produisent pas).
 - Usage de départ : ciment et béton (voir « Remplacement des objets vanilla », pierre).
 - Les scories s'accumulent : une recette qui les consomme (ciment, béton) doit être accessible tôt.
 
@@ -189,21 +189,24 @@ Décidé le 23 oct. 2026 : **un seul type de scorie**, comme des cendres.
 
 ### Ressources disponibles au départ (décision du 25 oct. 2026)
 
-Les huit ressources de départ sont validées. `iron-ore` et `copper-ore` désignent les produits vanilla récupérés depuis des roches adaptées ; ils ne signifient pas que le joueur extrait directement ces minerais vanilla comme des gisements autonomes. Au début, le traitement d'une roche récupère le minerai principal visé et transforme ses autres constituants en scories. Les rendements chiffrés restent à équilibrer.
+Les huit ressources de départ sont validées. Les roches de départ pour le métal sont l'**hématite** (fer, 69,9 %) et la **malachite** (cuivre, 57,5 %) : ce sont les minerais les plus simples (une seule phase, sans soufre). `iron-ore` et `copper-ore` sont les **produits** vanilla de leur premier raffinage ; ils ne sont pas posés dans le monde comme gisements. Au début, le traitement d'une roche récupère le minerai principal visé et transforme ses autres constituants **solides** en scories. Les rendements chiffrés restent à équilibrer.
+
+Décision du 25 oct. 2026 sur les éléments volatils : les constituants volatils (oxygène, hydrogène, carbone, soufre) **disparaissent** au raffinage basique au lieu de devenir des scories ; ils pourront sortir en gaz (CO₂, SO₂) avec des procédés plus tardifs. Les scories ne viennent donc que des éléments solides de la roche. Hématite et malachite n'en produisent presque pas : leurs autres constituants sont tous volatils.
 
 Les autres ressources pourront être réparties en paliers de prospection. La colonne `tech` de `resources` et les technologies précises restent à définir avec les recettes et les machines ; les paliers indiqués ci-dessous sont des propositions de travail et suivent le `level` actuel des ressources (54 basic, 30 advanced, 4 experimental).
 
 | Palier | Ressources | Nombre |
 | --- | --- | --- |
-| Départ (aucune recherche) | `stone`, `clay`, `limestone`, `sandstone`, `iron-ore`, `copper-ore`, `coal`, `water` | 8 |
-| Prospection de base | granite, basalt, marbre, quartzite, hématite, magnétite, malachite, cassitérite, galène, sphalérite, halite, gypse, soufre natif, tourbe, lignite | 15 |
-| Prospection géologique | les 31 autres ressources `basic` : gabbro, diorite, rhyolite, andésite, dolomie, schiste, craie, gneiss, ardoise, goethite, sidérite, bauxite, chalcopyrite, bornite, chalcocite, chromite, pyrolusite, ilménite, rutile, sylvite, carnallite, anhydrite, trona, nitratine, pyrite, apatite, graphite, anthracite, pétrole brut, eau de mer, air | 31 |
+| Départ (aucune recherche) | `stone`, `clay`, `limestone`, `sandstone`, hématite, malachite, `coal`, `water` | 8 |
+| Prospection de base | granite, basalt, marbre, quartzite, magnétite, goethite, sidérite, cassitérite, galène, sphalérite, halite, gypse, soufre natif, tourbe, lignite | 15 |
+| Prospection géologique | les 29 autres ressources `basic` : gabbro, diorite, rhyolite, andésite, dolomie, schiste, craie, gneiss, ardoise, bauxite, chalcopyrite, bornite, chalcocite, chromite, pyrolusite, ilménite, rutile, sylvite, carnallite, anhydrite, trona, nitratine, pyrite, apatite, graphite, anthracite, pétrole brut, eau de mer, air | 29 |
+| Produits (pas de gisement) | `iron-ore`, `copper-ore` : obtenus par raffinage de l'hématite et de la malachite (puis des autres minerais de fer et de cuivre) | 2 |
 | Prospection avancée | les 30 ressources `advanced` | 30 |
 | Matières nucléaires | les 4 ressources `experimental` (uraninite, carnotite, thorianite, `uranium-ore`) | 4 |
 
 Pourquoi ce départ :
 
-- Il reproduit l'ouverture de Factorio (fer, cuivre, charbon, pierre, eau), donc les premiers packs de science restent fabricables sans recherche.
+- Il reproduit l'ouverture de Factorio (fer, cuivre, charbon, pierre, eau), donc les premiers packs de science restent fabricables sans recherche. Le fer et le cuivre viennent de l'hématite et de la malachite ; les sulfures de cuivre (chalcocite, bornite, chalcopyrite) demandent la prospection géologique.
 - Argile, calcaire et grès donnent les briques, les fours et le ciment, qui sert aussi à consommer les scories dès le début.
 - Le palier « de base » apporte les métaux nécessaires aux premiers alliages (bronze, laiton), le sel et le gypse. Il suppose que l'étain passe `basic` (voir « Sens de `level` »).
 - Le pétrole brut arrive avec les technologies de pétrole du jeu de base, comme dans la version vanilla ; l'air est extrait par une machine.
@@ -213,7 +216,7 @@ Pourquoi ce départ :
 Décision du 25 oct. 2026 : les sept prototypes vanilla existants sont **réutilisés**, pas recréés.
 
 - Sept ressources sont marquées `vanilla = yes` : `stone`, `iron-ore`, `copper-ore`, `uranium-ore`, `coal`, `crude-oil`, `water`. Le loader ne crée pas leur item ou leur fluide. Les recettes, technologies et mods qui les utilisent continuent de fonctionner, et il n'y a ni doublon ni icône à refaire.
-- Les IDs vanilla `iron-ore` et `copper-ore` sont les produits de départ récupérés depuis des roches adaptées. Le raffinage initial ne récupère que le minerai ciblé ; les autres constituants deviennent des scories. Les rendements exacts et les procédés qui récupèrent les constituants secondaires seront définis plus tard.
+- Les IDs vanilla `iron-ore` et `copper-ore` sont les produits de départ du raffinage de l'hématite et de la malachite. Le raffinage initial ne récupère que le minerai ciblé ; les autres constituants solides deviennent des scories et les constituants volatils disparaissent. Les rendements exacts et les procédés qui récupèrent les constituants secondaires seront définis plus tard.
 - Ce qui change pour ces prototypes se règle dans `data-final-fixes` (sous-groupe, ordre, gisements, recettes de raffinage), sans recréer le prototype.
 - Tout ce qui n'existe pas dans le jeu est créé avec le préfixe `rp-` (décision confirmée le 25 oct. 2026). Les tables de données gardent les noms courts ; le loader préfixera les IDs des prototypes.
 - Certains éléments ont déjà un équivalent : `sulfur` probablement, `carbon`, `lithium` et `fluorine` avec Space Age (à vérifier dans `data.raw`). Proposition : réutiliser ceux du jeu de base, créer des `rp-` pour les autres, et trancher pour Space Age avec l'extension. Cela demande une colonne `vanilla` dans la feuille `elements`.
