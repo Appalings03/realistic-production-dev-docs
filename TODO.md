@@ -1,4 +1,3 @@
-
 # TODO — Realistic Production
 
 Mis à jour le 25 oct. 2026 · @Martin
@@ -134,8 +133,8 @@ Les détails et les chiffres sont dans `RAPPORT.md`.
 - [X] Déplacer ou supprimer `settings copy.lua` à la racine de `dev-docs` => Peu etre ignoré pour l'instant, utiliser code rappel de fonctionnement
 - [X] Archiver les fichiers `OLD` de `RoadMap/` (`Liste feature_OLD.xlsx`, `Roadmap — Realistic Production — OLD.md`)
 - [ ] Décider des stubs vides (`control.lua`, `data-updates.lua`, `data-final-fixes.lua`, `settings-*.lua`) : supprimer ou garder pour la suite
-- [ ] Changelogs : les 5 sont identiques (texte générique, 0.0.1 du 22 oct.)
-- [ ] Ajouter un `.gitignore` (un `__pycache__/*.pyc` est versionné dans dev-docs)
+- [X] Changelogs : les 5 sont identiques (texte générique, 0.0.1 du 22 oct.)
+- [X] Ajouter un `.gitignore` (un `__pycache__/*.pyc` est versionné dans dev-docs)
 - [ ] `verify.lua` : chemins Windows (`\\`) et ne contrôle que les données ; l'adapter ou le remplacer
 - [ ] **Premier lancement dans Factorio** : d'abord assets + utils + ore (après correction des 2 bugs), puis les cinq mods
 
