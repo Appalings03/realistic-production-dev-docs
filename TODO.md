@@ -1,6 +1,7 @@
+
 # TODO — Realistic Production
 
-Mis à jour le 25 oct. 2026 · @Martin
+Mis à jour le 27 oct. 2026 · @Martin
 
 Légende : `[X]` fait (vérifié dans les repos au 25 oct.) · `[~]` fait en partie · `[ ]` à faire
 
@@ -51,7 +52,7 @@ Les détails et les chiffres sont dans `RAPPORT.md`.
 - [~] `create_resource{...}` : création avec `minable.results`, `stages`, `map_color` et `autoplace` fournis par l'appelant ; densité, nodes purs et gisements mixtes à préciser avec les settings et données
 - [~] `create_recipe{...}` : **échoue toujours** (le champ `ingredients` est dans `INTERNAL_FIELDS`, donc supprimé avant la lecture) ; l'exemple du README d'utils échoue aussi. Après correction, retester avec cet exemple
 
-- [ ] Raffinage basique généré depuis `composition` : ajouter d'abord `primary` et définir le rendement / la destination des produits
+- [~] Raffinage basique généré depuis `composition` : `primary`, `volatile` et les compositions complètes sont dans le tableur ; il reste à définir le rendement et la destination des produits (et à écrire la génération)
 - [X] `create_technology{...}` : prérequis, recettes débloquées et coût en science via `unit`
 
 ### Assets, Building, Main (fichiers vides)
@@ -68,15 +69,15 @@ Les détails et les chiffres sont dans `RAPPORT.md`.
 - [X] `resources_data` (88), `elements_data` (118), `alloys_data` (5, quantités remplies), `groups_data`, `composition_data` (115 lignes)
 - [X] `level` rempli partout ; `generate_elements.py` et `elements.xlsx` versionnés dans dev-docs
 - [ ] `materials_data` et `components_data` : tables vides (lingots, plaques, poudres, pièces)
-- [ ] **44 compositions manquantes** : 19 roches, 19 minerais (dont bauxite, pentlandite, latérite, apatite, wolframite, coltan, monazite, bastnasite, lepidolite, carnotite, charbons, tourbe, bitumes), 6 fluides et gaz
-- [ ] Ajouter `primary` (composition) et `tech` (resources) dans le tableur et le générateur ; ajouter aussi une colonne indiquant les éléments volatils (ou une liste dans le générateur) pour calculer les scories
-- [ ] Compositions de départ à compléter d'abord : `stone`, `clay`, `limestone`, `sandstone`, `coal`, `water` (les 8 de départ n'en ont pas, sauf hématite et malachite)
-- [ ] Passer `iron-ore` et `copper-ore` en « produit » (pas de gisement) dans les données, et réattribuer goethite et sidérite au palier de base
-- [ ] Ajouter `vanilla` à la feuille `elements` si des éléments existent déjà dans le jeu
-- [ ] Ajouter `origin` à astatine et francium
+- [X] **44 compositions manquantes** (complétées le 27 oct., voir `proto_table/COMPOSITIONS.md`) : 19 roches, 19 minerais (dont bauxite, pentlandite, latérite, apatite, wolframite, coltan, monazite, bastnasite, lepidolite, carnotite, charbons, tourbe, bitumes), 6 fluides et gaz
+- [X] Ajouter `primary` (composition), `tech` et `world` (resources) et `volatile` (elements) dans le tableur et le générateur ; ajouter aussi une colonne indiquant les éléments volatils (ou une liste dans le générateur) pour calculer les scories
+- [X] Compositions de départ à compléter d'abord : `stone`, `clay`, `limestone`, `sandstone`, `coal`, `water` (les 8 de départ n'en ont pas, sauf hématite et malachite)
+- [X] `iron-ore` et `copper-ore` passés en « produit » (`world = no`) ; goethite et sidérite réattribuées au palier de base (`tech`)
+- [~] Colonne `vanilla` ajoutée à la feuille `elements` (vide) : à remplir quand on aura vérifié `data.raw` (`sulfur` est le seul candidat sûr du jeu de base)
+- [X] `origin` d'astate et de francium : `artificial`
 - [X] Aligner les niveaux selon le premier procédé qui libère l'élément : aluminium et silicium `advanced`, thorium et uranium `experimental`, étain `basic` (cassitérite et bronze `basic`)
-- [ ] Sources des 47 éléments naturels sans source (nickel et phosphore d'abord, puis terres rares, platinoïdes, niobium, tantale…)
-- [ ] Revoir les 23 `associated_with` quand les compositions seront complètes
+- [X] Sources des 47 éléments naturels qui n'en avaient pas : les 88 éléments naturels ont maintenant au moins une source (33 d'entre eux seulement en traces, voir `COMPOSITIONS.md`)
+- [ ] Revoir les 23 `associated_with` : les compositions sont maintenant complètes, la revue est possible
 - [ ] Ranger `elements_data` hors de `resources/` (ce sont des matériaux) ou le documenter
 
 ### Prototypes
@@ -90,6 +91,9 @@ Les détails et les chiffres sont dans `RAPPORT.md`.
 - [X] Fluides : couleurs (`base_color`, `flow_color`) définies dans `data.lua` pour les 18 fluides
 - [ ] Teintes des icônes : aucune colonne `tint` ni conversion de `kind`, donc les 204 icônes de test sont identiques
 - [ ] Confirmer le niveau du plomb (`advanced`, alors que la galène est `basic`)
+- [ ] Ajouter `world`, `tech` et `volatile` à `INTERNAL_FIELDS` dans `utils/ore.lua` (sinon ces champs sont copiés dans les prototypes d'items)
+- [ ] Copier dans `proto_table/` et dans `ore/prototypes/resources/` les trois tables régénérées (`resources_data`, `composition_data`, `elements_data`)
+- [ ] Feuilles `materials` et `components` : toujours vides (lingots, plaques, poudres, pièces) ; dépendent des recettes et des machines
 
 ### Settings et locale
 
@@ -133,8 +137,8 @@ Les détails et les chiffres sont dans `RAPPORT.md`.
 - [X] Déplacer ou supprimer `settings copy.lua` à la racine de `dev-docs` => Peu etre ignoré pour l'instant, utiliser code rappel de fonctionnement
 - [X] Archiver les fichiers `OLD` de `RoadMap/` (`Liste feature_OLD.xlsx`, `Roadmap — Realistic Production — OLD.md`)
 - [ ] Décider des stubs vides (`control.lua`, `data-updates.lua`, `data-final-fixes.lua`, `settings-*.lua`) : supprimer ou garder pour la suite
-- [X] Changelogs : les 5 sont identiques (texte générique, 0.0.1 du 22 oct.)
-- [X] Ajouter un `.gitignore` (un `__pycache__/*.pyc` est versionné dans dev-docs)
+- [ ] Changelogs : les 5 sont identiques (texte générique, 0.0.1 du 22 oct.)
+- [ ] Ajouter un `.gitignore` (un `__pycache__/*.pyc` est versionné dans dev-docs)
 - [ ] `verify.lua` : chemins Windows (`\\`) et ne contrôle que les données ; l'adapter ou le remplacer
 - [ ] **Premier lancement dans Factorio** : d'abord assets + utils + ore (après correction des 2 bugs), puis les cinq mods
 

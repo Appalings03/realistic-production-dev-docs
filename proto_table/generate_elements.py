@@ -19,7 +19,18 @@ Règles :
 - level      : basic / advanced / experimental (vide = avertissement)
 - kind       : resources, ore / rock / fluid / gas (fluid et gas -> type fluid)
 - extraction : resources, fluid et gas seulement : deposit (défaut) / air
-- vanilla    : resources, yes si la ressource existe déjà dans le jeu de base
+- vanilla    : resources et elements, yes si le prototype existe déjà dans le jeu
+               de base (il est alors réutilisé et non recréé)
+- world      : resources, no si la ressource n'est pas posée dans le monde
+               (produit de raffinage, ex. iron-ore) ; yes par défaut
+- tech       : resources, palier de prospection qui débloque la ressource
+               (vide = disponible au départ) : prospecting-basic /
+               prospecting-geological / prospecting-advanced / prospecting-nuclear
+- volatile   : elements, yes si l'élément disparaît au raffinage basique
+               quand il n'est pas `primary` (gaz, carbone, soufre)
+- primary    : composition, yes pour le ou les éléments récupérés au raffinage
+               basique (au moins un par ressource ; les autres éléments solides
+               deviennent des scories)
 - origin     : elements, natural / artificial
 - type       : elements, item (défaut) / fluid
 - stack_size : items seulement (100 par défaut)
@@ -35,6 +46,8 @@ from pathlib import Path
 from openpyxl import load_workbook
 
 LEVELS = ["basic", "advanced", "experimental"]
+TECH_TIERS = {"prospecting-basic", "prospecting-geological",
+              "prospecting-advanced", "prospecting-nuclear"}
 DEFAULT_STACK = 100
 MAX_ALLOY_PARTS = 4
 
@@ -42,6 +55,9 @@ ENUMS = {
     "kind": {"ore", "rock", "fluid", "gas"},
     "extraction": {"deposit", "air"},
     "vanilla": {"yes", "no"},
+    "world": {"yes", "no"},
+    "volatile": {"yes", "no"},
+    "primary": {"yes", "no"},
     "origin": {"natural", "artificial"},
     "type": {"item", "fluid"},
 }
@@ -50,12 +66,13 @@ SHEETS = {
     "resources": {
         "form": "ore", "file": "resources_data.lua", "kind": "items",
         "columns": ["name", "kind", "level", "extraction", "vanilla",
-                    "stack_size", "associated_with", "name_en", "name_fr"],
+                    "stack_size", "associated_with", "name_en", "name_fr",
+                    "world", "tech"],
     },
     "elements": {
         "form": "material", "file": "elements_data.lua", "kind": "items",
         "columns": ["name", "symbol", "atomic", "origin", "type", "level",
-                    "stack_size", "name_en", "name_fr"],
+                    "stack_size", "name_en", "name_fr", "volatile", "vanilla"],
     },
     "alloys": {
         "form": "material", "file": "alloys_data.lua", "kind": "items",
@@ -74,13 +91,13 @@ SHEETS = {
     },
     "composition": {
         "file": "composition_data.lua", "kind": "composition",
-        "columns": ["resource", "element", "percent"],
+        "columns": ["resource", "element", "percent", "primary"],
     },
 }
 FORMS = ["ore", "material", "component"]
 
 EMIT_ORDER = ["name", "form", "level", "subgroup", "order", "type", "kind",
-              "extraction", "vanilla", "origin", "symbol", "atomic", "base",
+              "extraction", "vanilla", "world", "tech", "volatile", "origin", "symbol", "atomic", "base",
               "associated_with", "ingredients", "stack_size", "name_en", "name_fr"]
 TEXT_COLS = ("symbol", "name_en", "name_fr")
 LOCALES = {
@@ -254,6 +271,21 @@ def build_items(sheet, cfg, ws, seen, rank, errors, warnings):
             entry["origin"] = values["origin"]
         if values.get("vanilla") == "yes":
             entry["vanilla"] = True
+        if values.get("world") == "no":
+            entry["world"] = False
+        if values.get("volatile") == "yes":
+            entry["volatile"] = True
+        if "tech" in cols and r["tech"] is not None:
+            tech = norm(r["tech"])
+            if tech not in TECH_TIERS:
+                errors.append(f"{where} : tech '{r['tech']}' invalide "
+                              f"({' / '.join(sorted(TECH_TIERS))})")
+                continue
+            if values.get("world") == "no":
+                errors.append(f"{where} : une ressource hors du monde (world = no) "
+                              "n'a pas de tech")
+                continue
+            entry["tech"] = tech
 
         for col in TEXT_COLS:
             if col in cols and r[col] is not None:
@@ -324,12 +356,19 @@ def build_composition(sheet, cfg, ws, errors):
             errors.append(f"{where} : doublon {key[0]} / {key[1]} (déjà ligne {pairs[key]})")
             continue
         pairs[key] = number
-        entries.append({"resource": key[0], "element": key[1],
-                        "percent": percent, "_row": number})
+        entry = {"resource": key[0], "element": key[1], "percent": percent, "_row": number}
+        if r["primary"] is not None:
+            primary = norm(r["primary"])
+            if primary not in ENUMS["primary"]:
+                errors.append(f"{where} : primary '{r['primary']}' invalide (yes / no)")
+                continue
+            if primary == "yes":
+                entry["primary"] = True
+        entries.append(entry)
     return entries
 
 
-def check_references(tables, errors):
+def check_references(tables, errors, warnings):
     def names(*sheets):
         return {e["name"] for s in sheets for e in tables[s]}
 
@@ -361,8 +400,40 @@ def check_references(tables, errors):
                           f"'{e['element']}' absent de elements")
         totals[e["resource"]] += e["percent"]
     for resource, total in totals.items():
-        if total > 100.5:
-            errors.append(f"composition : '{resource}' totalise {total:.2f} % (> 100)")
+        if not 99.5 <= total <= 100.5:
+            errors.append(f"composition : '{resource}' totalise {total:.2f} % "
+                          "(attendu entre 99,5 et 100,5)")
+
+    primaries = defaultdict(int)
+    for e in tables["composition"]:
+        primaries[e["resource"]] += 1 if e.get("primary") else 0
+    for resource in totals:
+        if primaries[resource] == 0:
+            errors.append(f"composition : '{resource}' n'a aucun élément primary")
+
+    # cohérence des données (avertissements, non bloquants)
+    sources = defaultdict(list)
+    for e in tables["composition"]:
+        sources[e["element"]].append(e["resource"])
+    rank = {level: i for i, level in enumerate(LEVELS)}
+    level_of = {e["name"]: e.get("level") for e in tables["resources"]}
+    for e in tables["resources"]:
+        if e["name"] not in totals and e["kind"] in ("ore", "rock"):
+            warnings.append(f"resources ligne {e['_row']} : '{e['name']}' sans composition")
+    for e in tables["elements"]:
+        found = sources.get(e["name"], [])
+        if e.get("origin") == "natural" and not found:
+            warnings.append(f"elements ligne {e['_row']} : '{e['name']}' (natural) "
+                            "n'a aucune source dans composition")
+        if e.get("origin") == "artificial" and found:
+            warnings.append(f"elements ligne {e['_row']} : '{e['name']}' (artificial) "
+                            f"apparaît dans {found[0]}")
+        if "origin" not in e:
+            warnings.append(f"elements ligne {e['_row']} : '{e['name']}' sans origin")
+        levels = [rank[level_of[s]] for s in found if level_of.get(s) in rank]
+        if levels and e.get("level") in rank and rank[e["level"]] < min(levels):
+            warnings.append(f"elements ligne {e['_row']} : '{e['name']}' est {e['level']} "
+                            "alors que toutes ses sources sont d'un palier plus élevé")
 
 
 def build(wb):
@@ -377,7 +448,7 @@ def build(wb):
         else:
             tables[sheet] = build_composition(sheet, cfg, wb[sheet], errors)
 
-    check_references(tables, errors)
+    check_references(tables, errors, warnings)
     return tables, errors, warnings
 
 
@@ -389,7 +460,7 @@ def to_lua(entries, sheet) -> str:
              "ne pas modifier à la main", "return {"]
     for e in entries:
         keys = [k for k in EMIT_ORDER if k in e] if "name" in e else \
-               [k for k in ("resource", "element", "percent") if k in e]
+               [k for k in ("resource", "element", "percent", "primary") if k in e]
         fields = ", ".join(f"{k} = {lua_value(e[k])}" for k in keys)
         lines.append("    { " + fields + " },")
     lines.append("}")

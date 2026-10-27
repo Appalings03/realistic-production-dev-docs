@@ -1,6 +1,6 @@
 # Roadmap — Realistic Production
 
-Mise à jour : 25 oct. 2026 · Cible : Factorio 2.1 · Extension Space Age prévue plus tard
+Mise à jour : 27 oct. 2026 · Cible : Factorio 2.1 · Extension Space Age prévue plus tard
 
 Objectif : des chaînes de production plus réalistes — roche brute → minerais → lingots → pièces → produits finis, avec fluides, broyage, multiblocs et nouveaux packs de science.
 
@@ -40,7 +40,8 @@ Dépendances : `assets` et `utils` ne dépendent que de `base` ; `ore` et `build
 - [X] **Scorie unique** décidée (23 oct.)
 - [X] **Définition du `level`** d'un élément : palier du premier procédé qui le libère ; Al/Si `advanced`, Th/U `experimental`, Sn `basic`
 - [X] Ressources disponibles au départ : les 8 ressources de `Item.md`, section 7 ; fer et cuivre viennent de l'hématite et de la malachite (`iron-ore` / `copper-ore` sont des produits, décision du 25 oct.)
-- [ ] Colonnes `primary` (composition), `tech` (resources) et `vanilla` (elements) dans le tableur et le générateur
+- [X] Colonnes `primary` (composition), `tech` et `world` (resources), `volatile` et `vanilla` (elements) dans le tableur et le générateur (27 oct.)
+- [X] Tableur complété : 88 ressources avec composition, 88 éléments naturels avec au moins une source (voir `proto_table/COMPOSITIONS.md`)
 - [ ] Confirmer le niveau du plomb (`advanced`, alors que la galène est `basic`)
 
 ## Phase 1 — Ore jouable *(en cours : 2 bugs à corriger avant le premier lancement)*
@@ -55,7 +56,7 @@ Jalon : le jeu démarre avec le mod ore ; items et fluides apparaissent dans le 
 - [X] Locale générée depuis `name_en` / `name_fr` par `generate_elements.py`
 - [X] Settings renommés (`rp-…`) avec leur locale
 - [ ] **Premier lancement dans Factorio** avec assets + utils + ore (jalon de la phase)
-- [ ] Compositions manquantes (44 ressources sur 88 : bauxite, pentlandite, latérite, apatite, roches…)
+- [X] Compositions manquantes (44 ressources complétées le 27 oct.)
 
 ## Phase 2 — Ressources et raffinage
 
@@ -99,7 +100,7 @@ Jalon : chaque étape de la chaîne de démarrage (extraction, concassage, prép
 
 ## Ordre de travail conseillé
 
-1. Phase 0 : ajouter les colonnes `primary` / `tech` / `vanilla` (quelques heures).
+1. Phase 0 : terminée côté tableur ; reste à confirmer le niveau du plomb.
 2. Phase 1 : corriger les 2 bugs (fluides, `create_recipe`), teintes d'icônes, puis premier lancement dans Factorio.
 3. Phase 2 : ressources, puis raffinage basique, puis ciment/béton et procédés avancés.
 4. Phases 3 et 4 en parallèle.
