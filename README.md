@@ -22,6 +22,7 @@ Centraliser tout ce qui concerne :
 - [`verify.lua`](./verify.lua) : script de validation rapide des prototypes chargés.
 - [`jpeg2png.py`](./jpeg2png.py) : petit utilitaire pour convertir une image JPEG en PNG.
 - [`RoadMap/`](./RoadMap/) : documents de planification et fichiers de travail liés à la roadmap.
+- [`interactive_techtree/`](./interactive_techtree/README.md) : arbres technologiques éditables du jeu de base et de Space Age.
 - [`proto_table/`](./proto_table/) : tables de données et références utiles pour la génération de prototypes.
 
 ### Documents de conception complémentaires
@@ -29,7 +30,8 @@ Centraliser tout ce qui concerne :
 - [`Item.md`](./RoadMap/Item.md) : notes sur les objets et les ressources.
 - [`machine.md`](./RoadMap/machine.md) : notes de conception des machines.
 - [`tech.md`](./RoadMap/tech.md) : notes sur les technologies.
-- [`FactorioMod_techtree.drawio`](./RoadMap/FactorioMod_techtree.drawio) : schéma de l'arbre technologique.
+- [`FactorioMod_techtree.drawio`](./RoadMap/FactorioMod_techtree.drawio) : schéma d'architecture de progression du mod.
+- [`interactive_techtree/`](./interactive_techtree/README.md) : arbres de technologies du jeu, avec images, prérequis et packs de science.
 - [`blender_models_checklist.md`](./RoadMap/blender_models_checklist.md) : checklist des modèles à produire avec Blender.
 - [`generate_elements.py`](./proto_table/generate_elements.py) : génère les tables Lua et les locales `en` / `fr` depuis le tableur.
 - [`elements.xlsx`](./proto_table/elements.xlsx) : tableur source des éléments.

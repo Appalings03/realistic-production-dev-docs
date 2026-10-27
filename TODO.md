@@ -1,4 +1,3 @@
-
 # TODO — Realistic Production
 
 Mis à jour le 27 oct. 2026 · @Martin
@@ -42,25 +41,25 @@ Les détails et les chiffres sont dans `RAPPORT.md`.
 
 - [X] `load_data(path)` : chargement et validation du retour des fichiers `*_data.lua`
 - [X] `create_item{...}` (préfixe `rp-`, icônes de test, vanilla ignoré)
-
 - [X] `create_fluid{...}` : `base_color` et `flow_color` exigés ; `default_temperature` vaut 15 par défaut et peut être surchargée
-
 - [X] `create_group` et `create_subgroup` (données dans `groups_data.lua`)
 - [X] `make_icons(name, tint)` : s'appuie sur `icons(name, opts)` de `general.lua`
 - [X] `ing(name, amount, type)` et `res(...)` : `type` explicite pour Factorio 2.x
 
 - [~] `create_resource{...}` : création avec `minable.results`, `stages`, `map_color` et `autoplace` fournis par l'appelant ; densité, nodes purs et gisements mixtes à préciser avec les settings et données
+
 - [X] `create_recipe{...}` : conserve `ingredients` avant la normalisation des ingrédients et résultats typés (Factorio 2.x)
 
 - [~] Raffinage basique généré depuis `composition` : `primary`, `volatile` et les compositions complètes sont dans le tableur ; il reste à définir le rendement et la destination des produits (et à écrire la génération)
+
 - [X] `create_technology{...}` : prérequis, recettes débloquées et coût en science via `unit`
 
-### Assets, Building, Main (fichiers vides)
+### Utilitaires Assets, Building, Main
 
-- [ ] `utils/assets.lua` : `sound_path(name)`, helper de sprites et d'animations
-- [ ] `utils/building.lua` : `create_building{base, ...}`, `create_recipe_category`, `create_crafting_category`, `fluid_boxes(...)`, `kw(n)`, `create_machine{...}`
+- [X] `utils/assets.lua` : `sound_path(name)`, helpers de sprites et d'animations
+- [X] `utils/building.lua` : `create_building{base, ...}`, `create_recipe_category`, `create_crafting_category`, `fluid_boxes(...)`, `kw(n)`, `create_machine{...}`
 - [ ] `function/multi.lua` (multiblocs) et `function/world.lua` (monde) : vides et non chargés par `data.lua`
-- [ ] `utils/main.lua` : `remove_resource`, `find_recipes_using`, `replace_ingredient`, `hide_prototype`, `remove_recipe`, `remove_tech_effect`, `fix_prerequisites`, `scale_recipe`
+- [X] `utils/main.lua` : `remove_resource`, `find_recipes_using`, `replace_ingredient`, `hide_prototype`, `remove_recipe`, `remove_tech_effect`, `fix_prerequisites`, `scale_recipe`
 
 ## 2. Ore (`realistic_production_ore`)
 
@@ -73,7 +72,9 @@ Les détails et les chiffres sont dans `RAPPORT.md`.
 - [X] Ajouter `primary` (composition), `tech` et `world` (resources) et `volatile` (elements) dans le tableur et le générateur ; ajouter aussi une colonne indiquant les éléments volatils (ou une liste dans le générateur) pour calculer les scories
 - [X] Compositions de départ à compléter d'abord : `stone`, `clay`, `limestone`, `sandstone`, `coal`, `water` (les 8 de départ n'en ont pas, sauf hématite et malachite)
 - [X] `iron-ore` et `copper-ore` passés en « produit » (`world = no`) ; goethite et sidérite réattribuées au palier de base (`tech`)
+
 - [~] Colonne `vanilla` ajoutée à la feuille `elements` (vide) : à remplir quand on aura vérifié `data.raw` (`sulfur` est le seul candidat sûr du jeu de base)
+
 - [X] `origin` d'astate et de francium : `artificial`
 - [X] Aligner les niveaux selon le premier procédé qui libère l'élément : aluminium et silicium `advanced`, thorium et uranium `experimental`, étain `basic` (cassitérite et bronze `basic`)
 - [X] Sources des 47 éléments naturels qui n'en avaient pas : les 88 éléments naturels ont maintenant au moins une source (33 d'entre eux seulement en traces, voir `COMPOSITIONS.md`)
@@ -97,9 +98,9 @@ Les détails et les chiffres sont dans `RAPPORT.md`.
 
 ### Settings et locale
 
-- [X] `settings.lua` : trois settings présents, avec ids normalisés (`rp-dev-assets`, `rp-pure-ore-nodes`, `rp-ore-density`), sans `per_user`, et avec un ordre explicite pour chaque option
+- [X] `settings.lua` : trois settings présents, avec ids normalisés (`rp-dev-assets`, `rp-mixed-ore-patches`, `rp-ore-density`), sans `per_user`, et avec un ordre explicite pour chaque option
 - [X] Locale des settings : `[mod-setting-name]` et `[mod-setting-description]` présents en EN et FR (générés)
-- [ ] Brancher `rp-pure-ore-nodes` et `rp-ore-density` dans `create_resource` (seul `rp-dev-assets` est lu aujourd'hui)
+- [ ] Brancher `rp-mixed-ore-patches` et `rp-ore-density` dans la génération des gisements ; le réglage de mélange autorise les ressources compatibles reliées par `associated_with`
 - [X] Générer `locale/en` et `locale/fr` depuis `name_en` / `name_fr` et synchroniser les locales du mod
 - [X] Blocs d'exemples commentés retirés de `settings.lua`
 
@@ -137,8 +138,8 @@ Les détails et les chiffres sont dans `RAPPORT.md`.
 - [X] Déplacer ou supprimer `settings copy.lua` à la racine de `dev-docs` => Peu etre ignoré pour l'instant, utiliser code rappel de fonctionnement
 - [X] Archiver les fichiers `OLD` de `RoadMap/` (`Liste feature_OLD.xlsx`, `Roadmap — Realistic Production — OLD.md`)
 - [ ] Décider des stubs vides (`control.lua`, `data-updates.lua`, `data-final-fixes.lua`, `settings-*.lua`) : supprimer ou garder pour la suite
-- [ ] Changelogs : les 5 sont identiques (texte générique, 0.0.1 du 22 oct.)
-- [ ] Ajouter un `.gitignore` (un `__pycache__/*.pyc` est versionné dans dev-docs)
+- [X] Changelogs : les 5 sont identiques (texte générique, 0.0.1 du 22 oct.)
+- [X] Ajouter un `.gitignore` (un `__pycache__/*.pyc` est versionné dans dev-docs)
 - [ ] `verify.lua` : chemins Windows (`\\`) et ne contrôle que les données ; l'adapter ou le remplacer
 - [ ] **Premier lancement dans Factorio** : valider assets + utils + ore, puis les cinq mods
 

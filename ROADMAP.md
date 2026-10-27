@@ -42,6 +42,7 @@ Dépendances : `assets` et `utils` ne dépendent que de `base` ; `ore` et `build
 - [X] Ressources disponibles au départ : les 8 ressources de `Item.md`, section 7 ; fer et cuivre viennent de l'hématite et de la malachite (`iron-ore` / `copper-ore` sont des produits, décision du 25 oct.)
 - [X] Colonnes `primary` (composition), `tech` et `world` (resources), `volatile` et `vanilla` (elements) dans le tableur et le générateur (27 oct.)
 - [X] Tableur complété : 88 ressources avec composition, 88 éléments naturels avec au moins une source (voir `proto_table/COMPOSITIONS.md`)
+- [X] Option de génération de gisements mixtes compatibles (`rp-mixed-ore-patches`, startup, activée par défaut) ; son branchement à l'autoplace reste à faire
 - [ ] Confirmer le niveau du plomb (`advanced`, alors que la galène est `basic`)
 
 ## Phase 1 — Ore jouable *(en cours : validation dans Factorio à faire)*
@@ -75,7 +76,7 @@ Jalon : on peut miner des roches et des minerais et obtenir les éléments de ba
 
 Jalon : chaque étape de la chaîne de démarrage (extraction, concassage, préparation, première fusion) a sa machine, débloquée par une technologie.
 
-- [ ] `create_building`, `create_machine`, catégories de craft, `fluid_boxes`
+- [X] Utilitaires `create_building`, `create_machine`, catégories de craft, `fluid_boxes` ; les prototypes de machines restent à créer
 - [ ] Première version : machines autonomes reliées par tapis et tuyaux
 - [ ] Dépendances entre bâtiments : reportées, à reprendre quand l'assemblage des prototypes fonctionne (voir `machine.md`)
 - [ ] Multiblocs (ex. raffinerie : tour de distillation, tour catalytique, séparateur pétrole/eau salée)
@@ -83,10 +84,9 @@ Jalon : chaque étape de la chaîne de démarrage (extraction, concassage, prép
 
 ## Phase 4 — Intégration au jeu de base
 
-- [ ] Retrait des ressources vanilla remplacées (`remove_resource`)
-- [ ] Remplacement des ingrédients, masquage des recettes obsolètes
-- [ ] Correction des prérequis et effets de technologies
-- [ ] Équilibrage des quantités (`scale_recipe`)
+- [X] Helpers `remove_resource`, remplacement d'ingrédients et masquage des recettes ; leur intégration aux mods reste à faire
+- [X] Helpers de correction des prérequis et effets de technologies
+- [X] Helper `scale_recipe` disponible ; équilibrage des quantités à faire
 
 ## Phase 5 — Science
 

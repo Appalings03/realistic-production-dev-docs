@@ -105,12 +105,12 @@ LOCALES = {
         "name_field": "name_en",
         "setting_names": {
             "rp-dev-assets": "Use development icons",
-            "rp-pure-ore-nodes": "Allow pure ore deposits",
+            "rp-mixed-ore-patches": "Generate mixed ore deposits",
             "rp-ore-density": "Ore density multiplier",
         },
         "setting_descriptions": {
             "rp-dev-assets": "Use placeholder development images instead of final icons.",
-            "rp-pure-ore-nodes": "Allow resource patches containing a single ore.",
+            "rp-mixed-ore-patches": "Allow compatible resources linked by associated_with to share generated patches.",
             "rp-ore-density": "Multiplier applied to resource patch density.",
         },
     },
@@ -118,12 +118,12 @@ LOCALES = {
         "name_field": "name_fr",
         "setting_names": {
             "rp-dev-assets": "Utiliser les icônes de développement",
-            "rp-pure-ore-nodes": "Autoriser les gisements de minerai pur",
+            "rp-mixed-ore-patches": "Générer des gisements de minerais mélangés",
             "rp-ore-density": "Multiplicateur de densité des minerais",
         },
         "setting_descriptions": {
             "rp-dev-assets": "Utilise les images temporaires de développement à la place des icônes finales.",
-            "rp-pure-ore-nodes": "Autorise les gisements contenant un seul type de minerai.",
+            "rp-mixed-ore-patches": "Autorise les ressources compatibles liées par associated_with à partager des gisements générés.",
             "rp-ore-density": "Multiplicateur appliqué à la densité des gisements.",
         },
     },
