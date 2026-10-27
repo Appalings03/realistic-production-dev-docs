@@ -20,7 +20,7 @@ Objectif : des chaînes de production plus réalistes — roche brute → minera
 | Repo     | Mod                               | Rôle                                                         | Avancement                                              |
 | -------- | --------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------- |
 | assets   | `realistic_production_assets`   | graphismes, sons                                              | ◐ images de test (`graphics/dev/`), README à jour, pas d'icône définitive |
-| utils    | `realistic_production_utils`    | fonctions communes                                            | ◐ `general.lua` (6 fonctions) et `ore.lua` (11 fonctions, 2 bugs), 3 modules vides |
+| utils    | `realistic_production_utils`    | fonctions communes                                            | ◐ `general.lua` (6 fonctions) et `ore.lua` (11 fonctions, correctifs ciblés vérifiés), 3 modules vides |
 | ore      | `realistic_production_ore`      | roches, minerais, fluides, éléments, alliages               | ◐ `data.lua` crée items, fluides et groupes (non testé dans Factorio) |
 | building | `realistic_production_building` | machines, multiblocs                                          | ▫ vide                                                 |
 | core     | `realistic_production_main`     | charge les autres, adapte le vanilla                          | ▫ vide                                                 |
@@ -32,11 +32,11 @@ Dépendances : `assets` et `utils` ne dépendent que de `base` ; `ore` et `build
 
 - [X] Découpage en 5 mods et dépendances, tous en 2.1
 - [X] Fonctions générales utils (`normalize_name`, `icon_path`, `icons`, `add_proto`, `copy_proto`, `get_settings`)
-- [X] Modèle de données : 88 ressources, 118 éléments, 5 alliages, groupes et sous-groupes, 115 lignes de composition (script Python)
+- [X] Modèle de données : 88 ressources, 118 éléments, 5 alliages, 32 matériaux, groupes et sous-groupes, 498 lignes de composition (script Python)
 - [X] Niveaux (`level`) et quantités d'alliages remplis
 - [X] Nettoyage : faute `buidling`, versions 2.1, `bool = {}` retiré des settings de building
 - [X] **Convention de noms décidée** (23 oct.) : tirets et préfixe `rp-`
-- [X] Normaliser les noms du générateur en tirets et régénérer les tables ; convention `rp-` décidée pour les prototypes non-vanilla (le renommage des settings reste à faire avec leur locale)
+- [X] Normaliser les noms du générateur en tirets et régénérer les tables ; convention `rp-` décidée pour les prototypes non-vanilla
 - [X] **Scorie unique** décidée (23 oct.)
 - [X] **Définition du `level`** d'un élément : palier du premier procédé qui le libère ; Al/Si `advanced`, Th/U `experimental`, Sn `basic`
 - [X] Ressources disponibles au départ : les 8 ressources de `Item.md`, section 7 ; fer et cuivre viennent de l'hématite et de la malachite (`iron-ore` / `copper-ore` sont des produits, décision du 25 oct.)
@@ -44,15 +44,15 @@ Dépendances : `assets` et `utils` ne dépendent que de `base` ; `ore` et `build
 - [X] Tableur complété : 88 ressources avec composition, 88 éléments naturels avec au moins une source (voir `proto_table/COMPOSITIONS.md`)
 - [ ] Confirmer le niveau du plomb (`advanced`, alors que la galène est `basic`)
 
-## Phase 1 — Ore jouable *(en cours : 2 bugs à corriger avant le premier lancement)*
+## Phase 1 — Ore jouable *(en cours : validation dans Factorio à faire)*
 
 Jalon : le jeu démarre avec le mod ore ; items et fluides apparaissent dans le menu de craft avec leurs noms FR/EN et des icônes de test.
 
 - [X] `data.lua` d'ore charge les données et crée les prototypes d'items et de fluides
 - [X] Générateurs `create_item`, `create_fluid`, groupes et sous-groupes (`utils/ore.lua`)
-- [ ] **Bug** : ajouter `default_temperature` aux fluides (propriété obligatoire, sinon le mod ne charge pas)
-- [ ] **Bug** : `create_recipe` échoue (le champ `ingredients` est filtré) ; corriger avant la phase 2
-- [ ] Icônes de test teintées par famille : aujourd'hui les 204 icônes sont identiques (pas de colonne `tint`)
+- [X] `create_fluid` fournit `default_temperature = 15` par défaut, surchargeable dans la définition
+- [X] `create_recipe` conserve `ingredients` avant la normalisation des champs typés
+- [ ] Icônes de test teintées par famille : aujourd'hui les 236 icônes d'items/fluides sont identiques (pas de colonne `tint`)
 - [X] Locale générée depuis `name_en` / `name_fr` par `generate_elements.py`
 - [X] Settings renommés (`rp-…`) avec leur locale
 - [ ] **Premier lancement dans Factorio** avec assets + utils + ore (jalon de la phase)
@@ -101,7 +101,7 @@ Jalon : chaque étape de la chaîne de démarrage (extraction, concassage, prép
 ## Ordre de travail conseillé
 
 1. Phase 0 : terminée côté tableur ; reste à confirmer le niveau du plomb.
-2. Phase 1 : corriger les 2 bugs (fluides, `create_recipe`), teintes d'icônes, puis premier lancement dans Factorio.
+2. Phase 1 : teintes d'icônes, puis premier lancement dans Factorio (les bugs `create_fluid` et `create_recipe` sont corrigés).
 3. Phase 2 : ressources, puis raffinage basique, puis ciment/béton et procédés avancés.
 4. Phases 3 et 4 en parallèle.
 5. Phase 5.

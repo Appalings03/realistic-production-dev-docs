@@ -1,6 +1,6 @@
 # Compositions des ressources
 
-Mis à jour le 25 oct. 2026. Ce fichier documente la feuille `composition` de `proto_table/elements.xlsx` : d'où vient chaque composition, quels éléments sont `primary`, et quelles valeurs sont des simplifications.
+Mis à jour le 27 oct. 2026. Ce fichier documente la feuille `composition` de `proto_table/elements.xlsx` : d'où vient chaque composition, quels éléments sont `primary`, et quelles valeurs sont des simplifications.
 
 ## Méthode
 

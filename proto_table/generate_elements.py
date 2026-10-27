@@ -407,7 +407,10 @@ def check_references(tables, errors, warnings):
     primaries = defaultdict(int)
     for e in tables["composition"]:
         primaries[e["resource"]] += 1 if e.get("primary") else 0
-    for resource in totals:
+    for resource in resources:
+        if resource not in totals:
+            errors.append(f"composition : '{resource}' n'a aucune composition")
+            continue
         if primaries[resource] == 0:
             errors.append(f"composition : '{resource}' n'a aucun élément primary")
 
@@ -423,11 +426,11 @@ def check_references(tables, errors, warnings):
     for e in tables["elements"]:
         found = sources.get(e["name"], [])
         if e.get("origin") == "natural" and not found:
-            warnings.append(f"elements ligne {e['_row']} : '{e['name']}' (natural) "
-                            "n'a aucune source dans composition")
+            errors.append(f"elements ligne {e['_row']} : '{e['name']}' (natural) "
+                          "n'a aucune source dans composition")
         if e.get("origin") == "artificial" and found:
-            warnings.append(f"elements ligne {e['_row']} : '{e['name']}' (artificial) "
-                            f"apparaît dans {found[0]}")
+            errors.append(f"elements ligne {e['_row']} : '{e['name']}' (artificial) "
+                          f"apparaît dans {found[0]}")
         if "origin" not in e:
             warnings.append(f"elements ligne {e['_row']} : '{e['name']}' sans origin")
         levels = [rank[level_of[s]] for s in found if level_of.get(s) in rank]

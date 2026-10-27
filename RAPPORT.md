@@ -1,6 +1,6 @@
 # Rapport d'état — 27 oct. 2026
 
-Fondé sur la lecture des 6 repos au 25 oct. 2026 (commits : assets `7756b15`, utils `b64f4b6`, ore `e2469a9`, building `b2f605b`, core `f8ceb39`, dev-docs `9eb9ec6`), sur le tableur `proto_table/elements.xlsx` complété le 27 oct. et sur une exécution de `ore/data.lua` dans une **simulation** de l'étape data (voir « Méthode et limites »). Les repos n'ont pas été resynchronisés depuis le 25 oct. Ce fichier décrit l'état actuel ; les versions précédentes du rapport (23 et 24 oct.) sont dans l'historique git.
+Fondé sur le tableur `proto_table/elements.xlsx` complété le 27 oct., les corrections du code et les validations locales du 27 oct. Le code et les tables générées sont synchronisés dans le workspace ; aucun commit/push git ni lancement du jeu Factorio n'a été effectué. Ce fichier décrit l'état actuel ; les versions précédentes du rapport (23, 24 et 25 oct.) sont conservées plus bas comme historique.
 
 ## Tableur terminé (27 oct.)
 
@@ -11,22 +11,21 @@ Le tableur `proto_table/elements.xlsx` est complété (détails dans `proto_tabl
 - nouvelles colonnes : `primary` (composition), `world` et `tech` (resources), `volatile` et `vanilla` (elements), lues et validées par `generate_elements.py` (qui contrôle aussi les sommes, la présence d'un `primary` par ressource et la cohérence des sources) ;
 - `iron-ore` et `copper-ore` sont des produits (`world = no`) ; les 8 ressources de départ et les paliers de prospection sont dans `tech` ;
 - niveau du nickel `advanced`, origine `artificial` pour l'astate et le francium ;
-- la régénération passe sans erreur ni avertissement, et `ore/data.lua` s'exécute toujours sans erreur dans la simulation avec les nouvelles tables (même nombre de prototypes : 186 items, 18 fluides).
+- la régénération passe sans erreur ni avertissement ; `ore/data.lua` s'exécute sans erreur dans la simulation avec les tables synchronisées (218 items, 18 fluides, 3 groupes et 9 sous-groupes) ;
+- les tables `resources`, `elements`, `composition`, `alloys`, `materials`, `components`, `groups` et les locales sont synchronisées entre `proto_table` et le mod ore.
 
-Point d'attention : `tech` et `volatile` sont copiés dans les prototypes d'items tant que `INTERNAL_FIELDS` (utils/ore.lua) ne les contient pas. Les tables régénérées ne sont pas encore dans le repo `ore`.
+Les champs `world`, `tech`, `volatile` et `primary` sont traités comme des métadonnées et ne fuient pas dans les prototypes. `create_resource` ignore les lignes `world = false`. Les systèmes de placement des gisements, de déblocage par technologie et de raffinage restent à implémenter ; les rendements de raffinage ne sont pas décidés.
 
 ## En bref
 
 - Le tableur est **terminé** (voir la section suivante).
-- Gros pas en avant depuis le 24 oct. : le **loader d'ore existe**. `utils/ore.lua` (366 lignes) et `ore/data.lua` créent 186 items, 18 fluides, 3 groupes et 9 sous-groupes, avec le préfixe `rp-`, les noms FR/EN et des icônes de test.
+- Le **loader d'ore** et le générateur utilisent les données complétées. `ore/data.lua` crée 218 items, 18 fluides, 3 groupes et 9 sous-groupes, avec le préfixe `rp-`, les noms FR/EN et des icônes de test.
 - Les décisions de nommage (`-`, `rp-`), de scorie unique, de ressources de départ, de réutilisation des items vanilla et de sens de `level` sont **appliquées dans le code et les données**, pas seulement dans les docs.
-- **Deux bugs bloquent un premier lancement ou l'écriture des recettes** (détail plus bas) :
-  1. les 18 fluides n'ont pas de `default_temperature`, propriété obligatoire : Factorio refusera de charger le mod ;
-  2. `create_recipe` échoue toujours, y compris avec l'exemple du README d'utils.
+- Les deux bugs de prototype précédemment relevés sont corrigés : température par défaut des fluides, et conservation des ingrédients dans `create_recipe`.
 - Rien n'a été lancé dans Factorio. Ce rapport décrit ce que le code fait dans une simulation, et ce que la documentation de Factorio impose.
 - Le jeu n'a toujours aucune entité, recette ni technologie : `building` et `core` sont inchangés (vides).
 
-## Ce qui a été poussé depuis le 24 oct.
+## Changements poussés avant les corrections locales du 27 oct.
 
 | Repo           | Commits                                            | Contenu                                                                                                                                                            |
 | -------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -38,35 +37,33 @@ Point d'attention : `tech` et `volatile` sont copiés dans les prototypes d'item
 
 ## Méthode et limites
 
-- **Simulation** : j'ai chargé `ore/data.lua` avec une petite imitation de l'étape data (`data:extend`, `data.raw`, `settings`, `require` à la manière de Factorio) et vérifié ce qui en sort. Cela détecte les erreurs Lua, les doublons et les références cassées. Cela **ne vérifie pas** les propriétés obligatoires que Factorio impose : celles-ci viennent de la documentation de l'API (`FluidPrototype`), pas d'un lancement.
-- `verify.lua` n'a pas été exécuté : ses chemins utilisent `\\` (Windows) et il ne contrôle que les tables de données, pas le loader.
-- Le 25 oct., le générateur relancé sur l'ancien tableur donnait des sorties **identiques** aux fichiers de dev-docs et du repo ore. Le 27 oct., seules `resources_data`, `composition_data` et `elements_data` changent ; les autres tables et les locales restent identiques.
+- **Simulation** : `ore/data.lua` a été exécuté avec une imitation de l'étape data (`data:extend`, `data.raw`, `settings`, `require`). Elle a enregistré 248 prototypes sans doublon : 218 items, 18 fluides, 3 groupes et 9 sous-groupes. Tous les fluides ont une température par défaut et aucune métadonnée `world`, `tech` ou `volatile` n'a fui dans les prototypes. Cela ne remplace pas un lancement Factorio.
+- `verify.lua` a été exécuté sur les tables synchronisées : 255 entrées vérifiées, aucun problème. Ce script valide les tables, pas le comportement runtime du jeu.
+- `generate_elements.py` a été relancé sur le classeur du 27 oct. : 88 ressources, 118 éléments, 5 alliages, 32 matériaux, 0 composant et 498 lignes de composition, sans erreur ni avertissement ; les fichiers générés sont synchronisés avec le mod ore.
 
 ## Résultats de la vérification du code
 
 ### Ce qui est correct
 
-- `ore/data.lua` s'exécute sans erreur et crée **204 prototypes** : 81 ressources non vanilla + 118 éléments + 5 alliages. Les 7 ressources vanilla ne sont pas recréées (`rp-water`, `rp-iron-ore`… n'existent pas).
-- Les 204 noms commencent par `rp-` et aucun ne contient `_`. Aucun doublon.
+- `ore/data.lua` s'exécute sans erreur et crée **248 prototypes** : 218 items, 18 fluides, 3 groupes et 9 sous-groupes. Les ressources vanilla ne sont pas recréées (`rp-water`, `rp-iron-ore`… n'existent pas).
+- Les prototypes personnalisés commencent par `rp-` et aucun nom ne contient `_`. Aucun doublon.
 - Tous les sous-groupes pointent vers un groupe existant ; tous les items et fluides pointent vers un sous-groupe existant.
-- Locales : 186 items, 18 fluides, 3 groupes, 9 sous-groupes et 3 settings, avec exactement les mêmes clés en EN et en FR, et en correspondance un pour un avec les prototypes créés (aucune clé en trop ni manquante).
+- Locales : 218 items, 18 fluides, 3 groupes, 9 sous-groupes et 3 settings, avec les mêmes clés en EN et en FR.
 - Les 18 fluides ont une couleur (`base_color`, `flow_color`) tirée des tables de `data.lua`.
 - Les icônes de test (`graphics/dev/1x1_item.png`) existent bien dans assets.
 - Les helpers `ing` et `res` exigent un `type` et refusent une quantité nulle ; `create_technology` préfixe les prérequis et les recettes débloquées (testé avec un exemple).
 
-### Bug 1 — fluides sans `default_temperature` (bloquant au lancement)
+### Bugs corrigés le 27 oct.
 
-La documentation de Factorio 2.x marque `default_temperature` comme obligatoire pour un prototype `fluid`. Les 18 fluides créés (13 éléments gazeux ou liquides, plus eau de mer, saumure de lithium, eau géothermale, gaz naturel, air) ont `base_color`, `flow_color`, `icons`, `order`, `subgroup`, mais pas cette propriété. Le mod ne démarrera donc pas. Correction : donner une valeur par défaut dans `create_fluid` (par exemple 15, comme l'eau vanilla), surchargeable par ligne de données.
-
-### Bug 2 — `create_recipe` échoue toujours
-
-Test : l'exemple exact du README d'utils (`crushing-hematite`) produit `create_recipe : ingredients obligatoires`. Cause : `ingredients` figure dans la liste `INTERNAL_FIELDS` (utilisée pour écarter les champs des tables de données, dont les alliages) ; `copy_definition` retire donc le champ avant que `create_recipe` ne le lise. Correction : recopier `definition.ingredients` dans `create_recipe` avant la normalisation (ou ne pas filtrer ce champ pour les recettes). Tant que ce n'est pas fait, la case « `create_recipe` » du TODO ne reflète pas la réalité.
+- `create_fluid` fournit `default_temperature = 15` si la définition ne la précise pas ; une température explicite est préservée. Le test ciblé a vérifié les deux cas.
+- `create_recipe` recopie `definition.ingredients` avant la normalisation, car ce champ reste une métadonnée filtrée pour les autres constructeurs. Le test ciblé a vérifié ingrédients et résultats de type item et fluid.
+- `INTERNAL_FIELDS` exclut maintenant `world`, `tech`, `volatile` et `primary` des prototypes. Le helper `create_resource` ignore en outre les ressources `world = false` et les ressources vanilla.
 
 ### Autres constats
 
-- **Toutes les icônes sont identiques** : les données générées n'ont pas de colonne `tint`, donc aucun item ni fluide n'est teinté (et `kind` n'est pas converti en teinte). Dans le menu de craft, les 204 entrées auront la même image. Ce n'est pas bloquant, mais ce n'est pas l'objectif de la phase 1.
+- **Toutes les icônes sont identiques** : les données générées n'ont pas de colonne `tint`, donc aucun item ni fluide n'est teinté (et `kind` n'est pas converti en teinte). Dans le menu de craft, les 236 entrées items/fluides ont la même image. Ce n'est pas bloquant, mais ce n'est pas l'objectif de la phase 1.
 - `ore.lua` fait `require("utils.general")` alors que les autres mods utilisent `__realistic_production_utils__.utils.general` : le même fichier peut être chargé deux fois sous deux noms (inoffensif ici, `general` n'a pas d'état). La résolution du chemin relatif depuis un autre mod reste à confirmer dans le jeu.
-- `create_resource` n'est appelé nulle part : il n'y a encore aucune ressource posée dans le monde, donc aucun gisement ni minage.
+- `create_resource` n'est appelé nulle part : il n'y a encore aucune ressource posée dans le monde, donc aucun gisement ni minage. Les lignes `world = no` sont néanmoins écartées par le helper.
 - Les alliages gardent `ingredients = { { name, amount } }` sans `type` : pas de problème tant qu'aucune recette n'en est générée, à corriger lors de la génération (voir `ing`).
 - Un fichier `.pyc` (`proto_table/__pycache__/`) est versionné dans dev-docs ; ajouter un `.gitignore`.
 - Les réglages sont lus par personne, sauf `rp-dev-assets` (icônes). `rp-pure-ore-nodes` et `rp-ore-density` n'ont pas d'effet tant que `create_resource` n'est pas utilisé.
@@ -79,19 +76,19 @@ Test : l'exemple exact du README d'utils (`crushing-hematite`) produit `create_r
 | elements              | 118    | 88 naturels, 30 artificiels (astate et francium inclus) ; 13 fluides ; niveaux 19 basic / 62 advanced / 37 experimental ; 15 volatils |
 | composition           | 498    | couvre les **88 ressources** ; un ou plusieurs `primary` par ressource                                                      |
 | alloys                | 5      | acier, bronze, laiton, duralumin, acier inox ; niveaux 2 basic / 2 advanced / 1 experimental                                      |
-| materials, components | 0      | vides                                                                                                                             |
+| materials             | 32     | formes de matériaux ; `components` reste vide                                                                                     |
 
 - **Noms** : tous les noms de données sont maintenant en `-`, références comprises (composition, alliages, `associated_with`), sans référence inconnue.
 - **Niveaux** : les 5 incohérences du 24 oct. sont résolues par la nouvelle définition (palier du premier procédé qui libère l'élément) : aluminium et silicium `advanced`, thorium et uranium `experimental`, étain `basic`. Un cas reste à confirmer : le **plomb** est `advanced` alors que la galène (sa source) est `basic`. Les gaz rares (hélium, néon, krypton, xénon) sont `advanced` alors que l'air est `basic`, ce qui est cohérent avec un procédé de séparation avancé.
 - **Les 88 éléments naturels ont une source** (27 oct.), y compris le nickel (pentlandite, latérite) et le phosphore (apatite) : l'acier inoxydable est réalisable.
-- Colonnes `primary`, `tech`, `world`, `volatile` et `vanilla` : ajoutées le 27 oct. ; la colonne `vanilla` des éléments est vide. Les feuilles `materials` et `components` restent vides.
+- Colonnes `primary`, `tech`, `world`, `volatile` et `vanilla` : ajoutées le 27 oct. ; la colonne `vanilla` des éléments est vide. La feuille `materials` contient 32 formes et `components` reste vide.
 
 ## État par repo
 
 | Repo     | Mod                               | Avancement | Contenu réel                                                                                                                        |
 | -------- | --------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------ |
 | assets   | `realistic_production_assets`   | ◐         | 4 icônes et 4 images de test ; README réécrit ; aucune icône définitive                                                         |
-| utils    | `realistic_production_utils`    | ◐         | `general.lua` (6 fonctions) et `ore.lua` (11 fonctions, 2 bugs) ; `assets`, `building`, `main`, `multi`, `world` vides |
+| utils    | `realistic_production_utils`    | ◐         | `general.lua` (6 fonctions) et `ore.lua` (11 fonctions, correctifs ciblés vérifiés) ; `assets`, `building`, `main`, `multi`, `world` vides |
 | ore      | `realistic_production_ore`      | ◐         | `data.lua` fonctionnel (items, fluides, groupes), settings et locales ; ni ressources, ni recettes, ni technologies                |
 | building | `realistic_production_building` | ▫         | rien : fichiers de prototypes vides, pas de `data.lua`, setting `RM-stp-order` à renommer ou supprimer                          |
 | core     | `realistic_production_main`     | ▫         | rien : stubs vides, description d'`info.json` copiée d'assets                                                                     |
@@ -101,7 +98,7 @@ Les `info.json` sont tous en 2.1 avec `base >= 2.1` ; les dépendances sont corr
 
 ## Décisions
 
-**Prises** : noms en `-` ; préfixe `rp-` ; scorie unique ; bâtiments reportés ; items vanilla réutilisés ; sens de `level` (palier du premier procédé qui libère l'élément) ; 8 ressources de départ (`stone`, `clay`, `limestone`, `sandstone`, hématite, malachite, `coal`, `water`) ; `iron-ore` et `copper-ore` sont des produits de raffinage, pas des gisements ; les éléments volatils disparaissent au raffinage basique. Les trois dernières décisions sont dans le tableur (`tech`, `world`, `volatile`) ; seul le chargement par le mod reste à faire.
+**Prises** : noms en `-` ; préfixe `rp-` ; scorie unique ; bâtiments reportés ; items vanilla réutilisés ; sens de `level` (palier du premier procédé qui libère l'élément) ; 8 ressources de départ (`stone`, `clay`, `limestone`, `sandstone`, hématite, malachite, `coal`, `water`) ; `iron-ore` et `copper-ore` sont des produits de raffinage, pas des gisements ; les éléments volatils disparaissent au raffinage basique. Les champs correspondants sont chargés et filtrés comme métadonnées ; le placement des gisements, les déblocages et le raffinage restent à implémenter.
 
 **Restent à décider** :
 
@@ -114,12 +111,10 @@ Les `info.json` sont tous en 2.1 avec `base >= 2.1` ; les dépendances sont corr
 
 ## Priorités
 
-1. **Corriger les 2 bugs** : `default_temperature` dans `create_fluid`, `ingredients` dans `create_recipe`.
-2. **Premier lancement dans Factorio** avec assets + utils + ore : c'est le premier vrai test de tout ce qui précède.
-3. Teintes des icônes (colonne `tint` ou table `kind` → couleur) pour distinguer les entrées.
-4. Copier les tables régénérées dans `ore` (et dans `proto_table/`), et ajouter `tech`, `volatile`, `world` à `INTERNAL_FIELDS`.
-5. `create_resource` utilisé par `ore` pour les 8 ressources de départ (sans autre recherche), puis raffinage basique.
-6. `.gitignore` pour `__pycache__` ; nettoyage de `RM-stp-order` dans building.
+1. **Premier lancement dans Factorio** avec assets + utils + ore : c'est le premier vrai test de tout ce qui précède.
+2. Teintes des icônes (colonne `tint` ou table `kind` → couleur) pour distinguer les entrées.
+3. Implémenter le placement des ressources et les paliers à partir de `world` / `tech`, puis le raffinage basique quand les rendements seront décidés.
+4. `.gitignore` pour `__pycache__` ; nettoyage de `RM-stp-order` dans building.
 
 ---
 

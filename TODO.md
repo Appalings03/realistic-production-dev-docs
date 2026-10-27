@@ -43,14 +43,14 @@ Les détails et les chiffres sont dans `RAPPORT.md`.
 - [X] `load_data(path)` : chargement et validation du retour des fichiers `*_data.lua`
 - [X] `create_item{...}` (préfixe `rp-`, icônes de test, vanilla ignoré)
 
-- [~] `create_fluid{...}` : `base_color` et `flow_color` exigés, mais **`default_temperature` (obligatoire) manque** : tant qu'il n'est pas ajouté, le mod ne charge pas dans Factorio
+- [X] `create_fluid{...}` : `base_color` et `flow_color` exigés ; `default_temperature` vaut 15 par défaut et peut être surchargée
 
 - [X] `create_group` et `create_subgroup` (données dans `groups_data.lua`)
 - [X] `make_icons(name, tint)` : s'appuie sur `icons(name, opts)` de `general.lua`
 - [X] `ing(name, amount, type)` et `res(...)` : `type` explicite pour Factorio 2.x
 
 - [~] `create_resource{...}` : création avec `minable.results`, `stages`, `map_color` et `autoplace` fournis par l'appelant ; densité, nodes purs et gisements mixtes à préciser avec les settings et données
-- [~] `create_recipe{...}` : **échoue toujours** (le champ `ingredients` est dans `INTERNAL_FIELDS`, donc supprimé avant la lecture) ; l'exemple du README d'utils échoue aussi. Après correction, retester avec cet exemple
+- [X] `create_recipe{...}` : conserve `ingredients` avant la normalisation des ingrédients et résultats typés (Factorio 2.x)
 
 - [~] Raffinage basique généré depuis `composition` : `primary`, `volatile` et les compositions complètes sont dans le tableur ; il reste à définir le rendement et la destination des produits (et à écrire la génération)
 - [X] `create_technology{...}` : prérequis, recettes débloquées et coût en science via `unit`
@@ -66,9 +66,9 @@ Les détails et les chiffres sont dans `RAPPORT.md`.
 
 ### Données (générées par `proto_table/generate_elements.py`)
 
-- [X] `resources_data` (88), `elements_data` (118), `alloys_data` (5, quantités remplies), `groups_data`, `composition_data` (115 lignes)
+- [X] `resources_data` (88), `elements_data` (118), `alloys_data` (5, quantités remplies), `materials_data` (32), `groups_data`, `composition_data` (498 lignes)
 - [X] `level` rempli partout ; `generate_elements.py` et `elements.xlsx` versionnés dans dev-docs
-- [ ] `materials_data` et `components_data` : tables vides (lingots, plaques, poudres, pièces)
+- [X] `materials_data` (32 formes de matériaux) généré ; `components_data` reste vide en attendant les décisions de conception
 - [X] **44 compositions manquantes** (complétées le 27 oct., voir `proto_table/COMPOSITIONS.md`) : 19 roches, 19 minerais (dont bauxite, pentlandite, latérite, apatite, wolframite, coltan, monazite, bastnasite, lepidolite, carnotite, charbons, tourbe, bitumes), 6 fluides et gaz
 - [X] Ajouter `primary` (composition), `tech` et `world` (resources) et `volatile` (elements) dans le tableur et le générateur ; ajouter aussi une colonne indiquant les éléments volatils (ou une liste dans le générateur) pour calculer les scories
 - [X] Compositions de départ à compléter d'abord : `stone`, `clay`, `limestone`, `sandstone`, `coal`, `water` (les 8 de départ n'en ont pas, sauf hématite et malachite)
@@ -82,16 +82,16 @@ Les détails et les chiffres sont dans `RAPPORT.md`.
 
 ### Prototypes
 
-- [X] `data.lua` charge les `*_data.lua` et crée items, fluides, groupes, sous-groupes (avec le préfixe `rp-`) : 204 prototypes + 12 groupes et sous-groupes dans une simulation de l'étape data (pas encore dans Factorio)
+- [X] `data.lua` charge les `*_data.lua` et crée items, fluides, groupes, sous-groupes (avec le préfixe `rp-`) : 236 items/fluides + 12 groupes et sous-groupes dans une simulation de l'étape data (pas encore dans Factorio)
 
 - [~] Ressources `vanilla = yes` : le prototype n'est pas créé (fait) ; reste à modifier en `data-final-fixes` ce qui change (sous-groupe, ordre, locale)
 
 - [ ] Supprimer ou remplir `prototypes/dev.lua`
 - [ ] Éléments qui existent déjà dans le jeu (`sulfur` probablement, et `carbon`, `lithium`, `fluorine` avec Space Age) : décider de les réutiliser ou de créer `rp-…` (à vérifier dans `data.raw`). Le préfixe supprime les collisions, `add_proto` n'a plus à ignorer de doublons en silence
 - [X] Fluides : couleurs (`base_color`, `flow_color`) définies dans `data.lua` pour les 18 fluides
-- [ ] Teintes des icônes : aucune colonne `tint` ni conversion de `kind`, donc les 204 icônes de test sont identiques
+- [ ] Teintes des icônes : aucune colonne `tint` ni conversion de `kind`, donc les 236 icônes d'items/fluides de test sont identiques
 - [ ] Confirmer le niveau du plomb (`advanced`, alors que la galène est `basic`)
-- [ ] Ajouter `world`, `tech` et `volatile` à `INTERNAL_FIELDS` dans `utils/ore.lua` (sinon ces champs sont copiés dans les prototypes d'items)
+- [X] Ajouter `world`, `tech` et `volatile` à `INTERNAL_FIELDS` dans `utils/ore.lua` pour éviter de copier ces métadonnées dans les prototypes
 - [ ] Copier dans `proto_table/` et dans `ore/prototypes/resources/` les trois tables régénérées (`resources_data`, `composition_data`, `elements_data`)
 - [ ] Feuilles `materials` et `components` : toujours vides (lingots, plaques, poudres, pièces) ; dépendent des recettes et des machines
 
@@ -140,7 +140,7 @@ Les détails et les chiffres sont dans `RAPPORT.md`.
 - [ ] Changelogs : les 5 sont identiques (texte générique, 0.0.1 du 22 oct.)
 - [ ] Ajouter un `.gitignore` (un `__pycache__/*.pyc` est versionné dans dev-docs)
 - [ ] `verify.lua` : chemins Windows (`\\`) et ne contrôle que les données ; l'adapter ou le remplacer
-- [ ] **Premier lancement dans Factorio** : d'abord assets + utils + ore (après correction des 2 bugs), puis les cinq mods
+- [ ] **Premier lancement dans Factorio** : valider assets + utils + ore, puis les cinq mods
 
 ## 7. Idées en attente
 

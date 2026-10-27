@@ -168,7 +168,7 @@ Ne pas prendre « l'élément au plus fort pourcentage » : dans les oxydes, les
 | gypse        | oxygène 55,76 · calcium 23,28 · soufre 18,62 · hydrogène 2,34 | de l'oxygène                    |
 | hématite    | fer 69,94 · oxygène 30,06                                        | du fer (correct)                 |
 
-Il faut donc une colonne **`primary`** (yes/no) dans la feuille `composition`, remplie à la main (ou pré-remplie puis corrigée). Avec la règle actuelle, une ressource a un seul élément `primary` ; à décider si certaines en auront plusieurs (la chalcopyrite pourrait garder cuivre et fer).
+La feuille `composition` utilise la colonne **`primary`** (yes/no) pour indiquer les éléments récupérés au raffinage basique. Une ressource a au moins un élément `primary` ; plusieurs sont permis quand le procédé sépare directement plusieurs produits, notamment pour l'eau, le pétrole brut, le gaz naturel et l'air. Le raffinage basique généré concerne les roches et minerais ; les fluides et gaz ont leurs propres procédés.
 
 ### Scories
 
