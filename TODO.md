@@ -1,8 +1,8 @@
 # TODO — Realistic Production
 
-Mis à jour le 27 oct. 2026 · @Martin
+Mis à jour le 28 oct. 2026 · @Martin
 
-Légende : `[X]` fait (vérifié dans les repos au 25 oct.) · `[~]` fait en partie · `[ ]` à faire
+Légende : `[X]` fait (vérifié dans les repos au 28 oct.) · `[~]` fait en partie · `[ ]` à faire
 
 Les détails et les chiffres sont dans `RAPPORT.md`.
 
@@ -58,8 +58,10 @@ Les détails et les chiffres sont dans `RAPPORT.md`.
 
 - [X] `utils/assets.lua` : `sound_path(name)`, helpers de sprites et d'animations
 - [X] `utils/building.lua` : `create_building{base, ...}`, `create_recipe_category`, `create_crafting_category`, `fluid_boxes(...)`, `kw(n)`, `create_machine{...}`
-- [ ] `function/multi.lua` (multiblocs) et `function/world.lua` (monde) : vides et non chargés par `data.lua`
+- [~] `function/multi.lua` (multiblocs) et `function/world.lua` (monde) : chargés par `utils/data.lua` mais encore vides
 - [X] `utils/main.lua` : `remove_resource`, `find_recipes_using`, `replace_ingredient`, `hide_prototype`, `remove_recipe`, `remove_tech_effect`, `fix_prerequisites`, `scale_recipe`
+- [ ] **Corriger `utils/main.lua`** (relecture du 28 oct.) : `hide_prototype` pose le drapeau `hidden` sur les items, alors qu'en 2.x il faut `hidden = true` (à confirmer au premier lancement) ; `replace_ingredient` ne cherche le nouvel ingrédient que dans `data.raw.item` (les packs de science, de type `tool`, recevraient un `rp-` à tort) ; `scale_recipe` accepte des facteurs qui donnent des quantités d'items non entières (erreur au chargement)
+- [ ] Vérifier que `remove_resource` suffit (références éventuelles dans les `autoplace-control` et les presets de génération de carte)
 
 ## 2. Ore (`realistic_production_ore`)
 
@@ -93,8 +95,8 @@ Les détails et les chiffres sont dans `RAPPORT.md`.
 - [ ] Teintes des icônes : aucune colonne `tint` ni conversion de `kind`, donc les 236 icônes d'items/fluides de test sont identiques
 - [ ] Confirmer le niveau du plomb (`advanced`, alors que la galène est `basic`)
 - [X] Ajouter `world`, `tech` et `volatile` à `INTERNAL_FIELDS` dans `utils/ore.lua` pour éviter de copier ces métadonnées dans les prototypes
-- [ ] Copier dans `proto_table/` et dans `ore/prototypes/resources/` les trois tables régénérées (`resources_data`, `composition_data`, `elements_data`)
-- [ ] Feuilles `materials` et `components` : toujours vides (lingots, plaques, poudres, pièces) ; dépendent des recettes et des machines
+- [X] Tables régénérées copiées dans `ore/` : `proto_table/` et `ore/prototypes/` sont identiques (vérifié le 28 oct.)
+- [~] Feuille `materials` remplie le 27 oct. (32 formes : lingots, plaques, poudres ; les plaques de fer, cuivre et acier sont celles du jeu de base) ; `components` reste vide (pièces), elle dépend des recettes et des machines
 
 ### Settings et locale
 
@@ -110,7 +112,8 @@ Les détails et les chiffres sont dans `RAPPORT.md`.
 - [X] `thumbnail.png` est un vrai PNG (720×380)
 - [X] `graphics/README.md` réécrit (25 oct.) : `graphics/items/<id-prototype>.png`, mode dev
 - [X] Une seule arborescence, alignée sur `icon_path`
-- [ ] Icônes de base par forme : roche, minerai, lingot, fluide, gaz (64×64, à teinter)
+- [~] Premier test d'icône Blender : `blender_model/plate/brass-plate.png` (64×64, fond transparent). Convention retenue le 27 oct. : **une base blanche/grise à effet métallique par forme, teintée par matériau** (reflets doux, pas de blanc brûlé) ; à valider sur 3 teintes
+- [ ] Icônes de base par forme : roche, minerai, lingot, plaque, poudre, fluide, gaz (64×64, à teinter) ; fixer d'abord les conventions de la section « Conventions visuelles » de `blender_models_checklist.md`
 - [ ] Miniature à la taille du mod portal
 - [ ] Sons et sprites quand nécessaire (voir `blender_models_checklist.md`)
 
@@ -134,12 +137,14 @@ Les détails et les chiffres sont dans `RAPPORT.md`.
 ## 6. Documentation et hygiène
 
 - [X] Repo `dev-docs` avec roadmap, TODO, rapport, notes de conception et tableur
+- [X] Nouveaux documents (27 oct.) : `RoadMap/process.md` (20 grands processus industriels), `interactive_techtree/` (arbres technologiques draw.io, jeu de base et Space Age), `blender_model/` (synthèse de la playlist Blender, aide-mémoire de raccourcis, premier test de plaque)
+- [ ] Relier `process.md` aux recettes et machines du mod (quels processus deviennent des multiblocs ou des recettes) et aux technologies de `tech.md`
 - [X] Remplacer les fichiers de `dev-docs` par ces nouvelles versions (`ROADMAP`, `TODO`, `RAPPORT`, `RoadMap/Item`, `machine`, `tech`)
 - [X] Déplacer ou supprimer `settings copy.lua` à la racine de `dev-docs` => Peu etre ignoré pour l'instant, utiliser code rappel de fonctionnement
 - [X] Archiver les fichiers `OLD` de `RoadMap/` (`Liste feature_OLD.xlsx`, `Roadmap — Realistic Production — OLD.md`)
 - [ ] Décider des stubs vides (`control.lua`, `data-updates.lua`, `data-final-fixes.lua`, `settings-*.lua`) : supprimer ou garder pour la suite
 - [X] Changelogs : les 5 sont identiques (texte générique, 0.0.1 du 22 oct.)
-- [X] Ajouter un `.gitignore` (un `__pycache__/*.pyc` est versionné dans dev-docs)
+- [~] `.gitignore` : le `__pycache__` n'est plus versionné dans dev-docs, mais aucun `.gitignore` n'existe encore (à ajouter dans chaque repo)
 - [ ] `verify.lua` : chemins Windows (`\\`) et ne contrôle que les données ; l'adapter ou le remplacer
 - [ ] **Premier lancement dans Factorio** : valider assets + utils + ore, puis les cinq mods
 

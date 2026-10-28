@@ -1,6 +1,6 @@
 # Roadmap — Realistic Production
 
-Mise à jour : 27 oct. 2026 · Cible : Factorio 2.1 · Extension Space Age prévue plus tard
+Mise à jour : 28 oct. 2026 · Cible : Factorio 2.1 · Extension Space Age prévue plus tard
 
 Objectif : des chaînes de production plus réalistes — roche brute → minerais → lingots → pièces → produits finis, avec fluides, broyage, multiblocs et nouveaux packs de science.
 
@@ -20,7 +20,7 @@ Objectif : des chaînes de production plus réalistes — roche brute → minera
 | Repo     | Mod                               | Rôle                                                         | Avancement                                              |
 | -------- | --------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------- |
 | assets   | `realistic_production_assets`   | graphismes, sons                                              | ◐ images de test (`graphics/dev/`), README à jour, pas d'icône définitive |
-| utils    | `realistic_production_utils`    | fonctions communes                                            | ◐ `general.lua` (6 fonctions) et `ore.lua` (11 fonctions, correctifs ciblés vérifiés), 3 modules vides |
+| utils    | `realistic_production_utils`    | fonctions communes                                            | ◐ `general.lua` (6 fonctions), `ore.lua` (11 fonctions), `assets.lua`, `building.lua` et `main.lua` écrits le 27 oct. (3 corrections à faire dans `main.lua`) ; `function/multi` et `function/world` vides |
 | ore      | `realistic_production_ore`      | roches, minerais, fluides, éléments, alliages               | ◐ `data.lua` crée items, fluides et groupes (non testé dans Factorio) |
 | building | `realistic_production_building` | machines, multiblocs                                          | ▫ vide                                                 |
 | core     | `realistic_production_main`     | charge les autres, adapte le vanilla                          | ▫ vide                                                 |
@@ -54,6 +54,7 @@ Jalon : le jeu démarre avec le mod ore ; items et fluides apparaissent dans le 
 - [X] `create_fluid` fournit `default_temperature = 15` par défaut, surchargeable dans la définition
 - [X] `create_recipe` conserve `ingredients` avant la normalisation des champs typés
 - [ ] Icônes de test teintées par famille : aujourd'hui les 236 icônes d'items/fluides sont identiques (pas de colonne `tint`)
+- [~] Icônes définitives : premier test Blender (plaque de laiton, 26 oct.) ; convention retenue : une base blanche métallique par forme, teintée par matériau ; à traiter après les fonctions de jeu
 - [X] Locale générée depuis `name_en` / `name_fr` par `generate_elements.py`
 - [X] Settings renommés (`rp-…`) avec leur locale
 - [ ] **Premier lancement dans Factorio** avec assets + utils + ore (jalon de la phase)
@@ -67,7 +68,7 @@ Jalon : on peut miner des roches et des minerais et obtenir les éléments de ba
 - [ ] Roches verrouillées au départ (technologie de prospection par roche)
 - [ ] Raffinage basique : élément principal + scories (`create_recipe`, `ing` / `res`)
 - [ ] Gaz de l'air (machine) et fluides (gisements)
-- [ ] Alliages simplifiés (acier, bronze, laiton, acier inox, duralumin)
+- [ ] Alliages simplifiés (acier, bronze, laiton, acier inox, duralumin) ; lingots, plaques et poudres déjà dans `materials` (32 formes)
 - [ ] Recettes de ciment et de béton à partir des scories
 - [ ] Procédés avancés : extraction des éléments secondaires depuis la roche brute
 - [ ] Technologies de déblocage par niveau : Basic → Advanced → Experimental
@@ -85,6 +86,7 @@ Jalon : chaque étape de la chaîne de démarrage (extraction, concassage, prép
 ## Phase 4 — Intégration au jeu de base
 
 - [X] Helpers `remove_resource`, remplacement d'ingrédients et masquage des recettes ; leur intégration aux mods reste à faire
+- [ ] Corriger 3 points de `utils/main.lua` : masquage des items (`hidden = true`), types d'items dans `replace_ingredient`, quantités entières dans `scale_recipe`
 - [X] Helpers de correction des prérequis et effets de technologies
 - [X] Helper `scale_recipe` disponible ; équilibrage des quantités à faire
 
@@ -97,6 +99,13 @@ Jalon : chaque étape de la chaîne de démarrage (extraction, concassage, prép
 ## Phase 6 — Space Age *(plus tard)*
 
 - [ ] Extension séparée, après stabilisation des phases 1 à 5
+
+## Documents de conception
+
+- `RoadMap/Item.md` (items et éléments), `machine.md` (machines), `tech.md` (technologies et packs de science)
+- `RoadMap/process.md` : 20 grands processus industriels (sidérurgie, ciment, verre, aluminium, pétrole…), source pour les recettes et les multiblocs
+- `interactive_techtree/` : arbres technologiques vanilla et Space Age (draw.io) ; `RoadMap/FactorioMod_techtree.drawio` pour la progression du mod
+- `blender_models_checklist.md` et `blender_model/` : liste des modèles 3D, guides Blender, premier test d'icône
 
 ## Ordre de travail conseillé
 

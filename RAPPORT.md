@@ -1,3 +1,104 @@
+# Rapport d'état — 28 oct. 2026
+
+Fondé sur la lecture des 6 repos au 28 oct. 2026 (commits : assets `a26b7ad`, utils `5c08c95`, ore `d4eb4c1`, building `f2555ae`, core `609914d`, dev-docs `124a01c`), sur le tableur `proto_table/elements.xlsx` et sur une **simulation** de l'étape data qui exécute `ore/data.lua` avec les dépôts réels (voir « Méthode et limites »). Ce fichier décrit l'état actuel ; les versions précédentes du rapport (23, 24, 25 et 27 oct.) sont dans l'historique git.
+
+## En bref
+
+- Les **deux bugs** relevés le 25 oct. (`default_temperature` des fluides, `ingredients` perdu dans `create_recipe`) sont **corrigés et poussés**, ainsi que `INTERNAL_FIELDS` (`world`, `tech`, `volatile`, `primary`) et `VANILLA_IDS` (plaques de fer, de cuivre et d'acier).
+- Le **tableur est complet** : 88 ressources avec composition, 118 éléments, 5 alliages et **32 matériaux** (lingots, plaques, poudres) ; `components` reste vide. Les tables du mod `ore` sont **identiques** à celles de `dev-docs`.
+- `utils` a gagné trois modules le 27 oct. : `assets.lua`, `building.lua` et `main.lua` (relu ci-dessous : 3 corrections à faire). `function/multi.lua` et `function/world.lua` sont chargés mais vides.
+- La simulation sur les dépôts réels passe : 218 items, 18 fluides, 3 groupes, 9 sous-groupes et 3 settings, sans doublon ; tous les fluides ont une température par défaut.
+- **Rien n'a encore été lancé dans Factorio** ; `building` et `core` n'ont toujours ni prototype ni `data.lua` (seul le changelog a changé).
+- Nouvelle documentation : `RoadMap/process.md` (20 grands processus), arbres technologiques draw.io, guides Blender et premier test d'icône (`blender_model/plate/brass-plate.png`).
+
+## Changements depuis le 25 oct.
+
+| Repo | Commits | Contenu |
+| --- | --- | --- |
+| utils | `2e554ff`, `5c08c95` | `building.lua` (147 lignes), `assets.lua` (56), `main.lua` (312) ; `function/multi.lua` et `world.lua` (vides) ; correctifs de `ore.lua` ; README étendu |
+| ore | `098fbc2`, `d4eb4c1` | tables complètes (`composition_data` 498 lignes, `materials_data` 32), locales régénérées, setting `rp-mixed-ore-patches` à la place de `rp-pure-ore-nodes` |
+| assets, building, core | un commit chacun | changelog uniquement |
+| dev-docs | `c5f3ecb`, `1c74c78`, `124a01c` | rapport, tableur et générateur mis à jour ; `process.md` ; arbres technologiques ; guides Blender ; première icône |
+
+## Méthode et limites
+
+- **Simulation** : `ore/data.lua` est exécuté avec une imitation de l'étape data (`data:extend`, `data.raw`, `settings`, `require`) sur les dépôts réels `assets`, `utils` et `ore`. Elle enregistre sans doublon 218 items, 18 fluides, 3 groupes et 9 sous-groupes ; elle ne remplace pas un lancement Factorio.
+- La relecture de `utils/building.lua`, `assets.lua` et `main.lua` est une lecture de code : leurs fonctions ne sont appelées nulle part pour l'instant, donc elles n'ont pas été exécutées.
+
+## Résultats de la vérification du code
+
+### Ce qui est correct
+
+- Les correctifs du 27 oct. sont bien dans `utils/ore.lua` : `default_temperature = 15` (nombre fini vérifié), `ingredients` conservé dans `create_recipe`, `world`/`tech`/`volatile`/`primary` exclus des prototypes, `create_resource` ignore `world = false` et les ressources vanilla.
+- `VANILLA_IDS` contient maintenant `iron-plate`, `copper-plate` et `steel-plate` ; aucun `rp-iron-plate` n'est créé. Les 9 plaques créées sont celles du zinc, de l'étain, du plomb, du nickel, de l'aluminium, du bronze, du laiton, de l'acier inoxydable et du duralumin.
+- Les prototypes personnalisés commencent par `rp-`, sans `_` ni doublon ; les sous-groupes et groupes sont cohérents.
+- `building.lua` : `create_machine` valide la vitesse, l'énergie, les catégories de craft et les `fluid_boxes`, préfixe les catégories et fournit des icônes de test. `assets.lua` : chemins de sons, sprites et animations. Ces trois modules ne créent ni item ni recette de machine : c'est un squelette.
+
+### À corriger dans `utils/main.lua`
+
+1. **`hide_prototype`** : pour les items, la fonction ajoute le drapeau `"hidden"` à `flags`. Dans Factorio 2.x, le masquage se fait avec `hidden = true` sur le prototype (comme déjà fait pour les recettes et les technologies) ; à confirmer au premier lancement.
+2. **`replace_ingredient`** : `qualify_item_name` ne cherche le nouvel ingrédient que dans `data.raw.item`. Un pack de science (type `tool`), une munition ou une capsule ne sont donc pas trouvés et reçoivent un préfixe `rp-` à tort (`rp-automation-science-pack`). Il faut chercher dans tous les types d'items (`ITEM_TYPES`).
+3. **`scale_recipe`** : un facteur non entier (par exemple 0,5 sur une quantité de 1) donne une quantité d'item non entière, refusée au chargement. Il faut arrondir ou refuser le facteur pour les items ; les fluides acceptent les décimales.
+
+À vérifier : `remove_resource` supprime le prototype, mais les `autoplace-control` et les presets de génération de carte peuvent encore le référencer.
+
+### Autres constats
+
+- **Toutes les icônes sont identiques** : aucune colonne `tint` ; les 236 entrées items/fluides ont la même image de test.
+- `ore.lua` fait `require("utils.general")` alors que les autres mods utilisent `__realistic_production_utils__.utils.general` ; à confirmer dans le jeu.
+- `create_resource` n'est appelé nulle part : aucun gisement n'existe encore dans le monde, donc `rp-mixed-ore-patches` et `rp-ore-density` n'ont pas d'effet.
+- Les alliages gardent `ingredients = { { name, amount } }` sans `type` : à corriger quand les recettes d'alliage seront générées.
+- `building` a toujours son setting `RM-stp-order` (préfixe incohérent, sans locale).
+- Pas de `.gitignore` dans `dev-docs` : le `__pycache__` n'est plus versionné, mais un `.gitignore` évitera son retour.
+
+## Données (générateur et tableur)
+
+| Table | Lignes | Remarque |
+| --- | --- | --- |
+| resources | 88 | 54 basic / 30 advanced / 4 experimental ; 7 vanilla ; 2 produits (`world = no`) ; 23 avec `associated_with` |
+| elements | 118 | 88 naturels, 30 artificiels ; 13 fluides ; 19 basic / 62 advanced / 37 experimental ; 15 volatils |
+| composition | 498 | couvre les 88 ressources ; au moins un `primary` par ressource |
+| alloys | 5 | acier, bronze, laiton, duralumin, acier inoxydable |
+| materials | 32 | lingot, plaque, poudre pour 9 bases ; lingot et poudre pour le fer et le cuivre ; lingot d'acier |
+| components | 0 | à remplir avec les recettes |
+
+La colonne `vanilla` des éléments est vide. Le niveau du plomb (`advanced`, galène `basic`) reste à confirmer.
+
+## État par repo
+
+| Repo | Mod | Avancement | Contenu réel |
+| --- | --- | --- | --- |
+| assets | `realistic_production_assets` | ◐ | images de test, README ; aucune icône définitive |
+| utils | `realistic_production_utils` | ◐ | `general` (6), `ore` (11), `assets`, `building`, `main` ; `multi` et `world` vides |
+| ore | `realistic_production_ore` | ◐ | `data.lua` fonctionnel (items, fluides, groupes), settings, locales, tables complètes ; ni ressources, ni recettes, ni technologies |
+| building | `realistic_production_building` | ▫ | rien (pas de `data.lua`) |
+| core | `realistic_production_main` | ▫ | rien |
+| dev-docs | (documentation) | ✓ | roadmap, TODO, rapport, conception, process, arbres technologiques, Blender, générateur et tableur |
+
+## Décisions
+
+**Prises** : noms en `-` ; préfixe `rp-` ; scorie unique ; bâtiments reportés ; items vanilla réutilisés (dont les plaques de fer, cuivre et acier) ; sens de `level` ; 8 ressources de départ ; `iron-ore` et `copper-ore` sont des produits de raffinage ; éléments volatils disparus au raffinage basique ; icônes : une base blanche métallique par forme, teintée par matériau (les icônes viennent après les fonctions de jeu).
+
+**Restent à décider** :
+
+1. Plomb : `basic` (comme la galène) ou `advanced` ?
+2. Quantité de scories par recette de raffinage basique (rendements hématite et malachite).
+3. Éléments déjà dans le jeu (`sulfur`, `carbon`, `lithium`, `fluorine`) : réutiliser ou créer `rp-…`.
+4. Technologies réelles de prospection (les paliers sont dans la colonne `tech`).
+5. Colonne `vanilla` des éléments à vérifier dans `data.raw`.
+6. Contenu de `components`.
+7. Quels processus de `process.md` deviennent des multiblocs ou des recettes.
+
+## Priorités
+
+1. **Premier lancement dans Factorio** avec assets + utils + ore.
+2. Corriger les 3 points de `utils/main.lua`.
+3. Raffinage basique (recettes roche → élément principal + scories) après décision des rendements, puis `create_resource` pour les 8 ressources de départ.
+4. Teintes des icônes de test, puis icônes Blender (conventions de la checklist d'abord).
+5. Nettoyage : `RM-stp-order` dans building, stubs vides.
+
+---
+
 # Rapport d'état — 27 oct. 2026
 
 Fondé sur le tableur `proto_table/elements.xlsx` complété le 27 oct., les corrections du code et les validations locales du 27 oct. Le code et les tables générées sont synchronisés dans le workspace ; aucun commit/push git ni lancement du jeu Factorio n'a été effectué. Ce fichier décrit l'état actuel ; les versions précédentes du rapport (23, 24 et 25 oct.) sont conservées plus bas comme historique.
